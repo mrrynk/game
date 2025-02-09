@@ -2,9 +2,9 @@ getgenv().petsGoConfig = {
     CONSUME_CORRUPTED_HUGE_BAIT = true,
     CONSUME_ALL_ENCHANT_SAFE = true,
     CONSUME_ALL_MINING_CHEST = true,
-    CONSUME_EVENT_GIFT_BAG = false,
+    CONSUME_EVENT_GIFT_BAG = true,
     CONSUME_EVENT_EGG = false, -- Hype eggs not included
-    IGNORE_DICE_COMBO = false,
+    IGNORE_DICE_COMBO = true,
 
 	WEBHOOK_URL = "https://discord.com/api/webhooks/1337666581345472592/XafzLChTcZvVa8XYG9I3Y_oa_-0iGK61D1JmgiJiuBDRprX86ziYFpoouCItAp0ES5n5",
     MAILING_WEBHOOK_URL = "https://discord.com/api/webhooks/1337666581345472592/XafzLChTcZvVa8XYG9I3Y_oa_-0iGK61D1JmgiJiuBDRprX86ziYFpoouCItAp0ES5n5",
@@ -16,7 +16,7 @@ getgenv().petsGoConfig = {
 
     PICKAXE_ENCHANTS = {"Speed", "Strength", "Huges"},
     
-    MAILING = true,  -- Auto mail
+    MAILING = false,  -- Auto mail
     MAIL_FISHING_ROD = false,  -- true = mail, false = keep fishing rod on account (FASTER Fishing)
     MAIL_WEBHOOK_ODDS = 1000000000, -- Minimum Pet Odds To Trigger MAIL Webhook
     MAIL_PET_ODDS = 500000000,  -- Minimum Pet Odds To Mail
@@ -31,15 +31,17 @@ getgenv().petsGoConfig = {
       CELESTIAL_ENCHANT_SAFE = 1,
     }, 
     USERNAME_TO_MAIL = {
-      "BrucePattyx71", "ManningMatthewc95", "HicksLeviv5398", "BakerJesset0",
-      "SchwartzJennyv5017", "OnealBaileyr61", "JacksonBluebelle3359", "PughJosep8218", "WebsterFrancesi00",
-      "ValdezKendraf9396", "RodgersDillonj8607", "AyalaRosej4159", "SnowRodneyw6", "ChristianKathrynk039",
-      "MitchellJulianm2899", "GonzalezNicoles9", "MckinneySophiar5980", "HollowayKyliey3455", "StanleyBryanl7",
-      "KeithPurrp44", "StricklandTrevorl3", "BuckGlennu3848", "BondJaviera39", "PearsonMorganq68",
-      "MaciasMelodyv7607", "ClarkDouglasd2230", "HansonJanices8796", "LindseyCristinaw982", "SweeneyHaleyq44",
-      "HensonJima6", "HayesStaceyz23", "MaynardRobertao6627", "PhillipsTommyq089", "HendersonEricx48",
-      "ChenLaurae1103", "RojasJoelv4", "HansenAmbere91", "DayStevenu1", "StarkPerryc33"
-  }
+	    "WoodSamuels0063", "KochSophiab3951", "HarrisDonw437",
+	    "YoungBearyh5", "DeanRhondat91", "GatesButterflyr257", "TearoseAdamx28", "DrakeDeane0",
+	    "GreenJoeh6258", "MayerTroyz67", "AnthonyMirandaj20", "FullerDeannad15", "ObrienKurtr832",
+	    "CoxPrestonv381", "WhiteheadPatrickf588", "BallardDavidc323", "MauveMarilyns5", "BartlettAprilm5671",
+	    "AdamsShelbyc6", "ConwayWendyi67", "BarkerJoelc8857", "MontesLaceyc76", "GoodmanGardene56",
+	    "RichardsonRaymondj34", "MartinezLeslief827", "OrtegaLeahw393", "VioletMercedesx7575",
+	    "MaloneKirsteny8", "KennedyJudithj1", "JohnsonBenjaminw510", "BushAlyssaq72",
+	    "JarvisHectort8469", "MathisRobertoz251", "VasquezRonaldd2", "KaiserLindseyg11",
+	    "MurphyBrendam785", "BarryAshleys34", "ChambersKatiej490", "LesterSierraq84", "CarterErich7"
+	}
+
   
 }
 
