@@ -31,16 +31,28 @@ getgenv().petsGoConfig = {
       CELESTIAL_ENCHANT_SAFE = 1,
     }, 
     USERNAME_TO_MAIL = {
-	    "CarlsonDarryld1", "KochSophiab3951", "HarrisDonw437",
-	    "YoungBearyh5", "DeanRhondat91", "GatesButterflyr257", "TearoseAdamx28", "DrakeDeane0",
-	    "GreenJoeh6258", "MayerTroyz67", "AnthonyMirandaj20", "FullerDeannad15", "ObrienKurtr832",
-	    "CoxPrestonv381", "WhiteheadPatrickf588", "MauveMarilyns5", "BartlettAprilm5671",
-	    "AdamsShelbyc6", "ConwayWendyi67", "BarkerJoelc8857", "MontesLaceyc76", "GoodmanGardene56",
-	    "RichardsonRaymondj34", "MartinezLeslief827", "OrtegaLeahw393", "VioletMercedesx7575",
-	    "MaloneKirsteny8", "KennedyJudithj1", "JohnsonBenjaminw510", "BushAlyssaq72",
-	    "JarvisHectort8469", "MathisRobertoz251", "VasquezRonaldd2", "KaiserLindseyg11",
-	    "MurphyBrendam785", "BarryAshleys34", "ChambersKatiej490", "LesterSierraq84"
+	    "AriasScottk2", "MaloneAlejandral28", "GoodwinJonathano82", "ReedDaffodili997",
+	    "MendozaJasminew7", "RamirezHibiscuso6597", "BestJerryh25", "RandallSheenav67",
+	    "PattersonKathyi173", "WarrenWilliamf97", "ChavezSamuelj57", "TaylorJustinf07",
+	    "BergerWaynen522", "SimonKatherinep247", "JenkinsJillk2", "TearoseKathleenj697",
+	    "WiseGabrielleg615", "SeashellBreannaq2", "TrujilloJuanc06", "DonovanLisae8",
+	    "MarshallMatthewo3", "WarrenMatthewa9", "CantuJacobd3", "HeathGardend0",
+	    "RoseShawny4", "HensonSylvial59", "BoydKatelync331", "VanceMollye3311",
+	    "ParkMistyk1707", "WallerDebbieb7348", "CainJerryc369", "VerdigrisOmarc60",
+	    "MathisKennethx7229", "AlexanderNormae71", "PhamBloomingy96", "OconnorBrendana931",
+	    "BassMirandab226", "CedarRoyl4", "LoweJudithi1", "RichNeilz9",
+	    "CruzMichaelg6158", "DeanBrents9275", "ValentineLukek3", "ParkGeoffreyx4",
+	    "FrenchJasmineu9729", "CraigShelbyj152", "AdkinsBrada80", "BlueRaymondy1",
+	    "HenryRachels782", "YuLarryr4", "MorenoThomasy9", "WarmOctopib13",
+	    "AlexanderConniet15", "WestWhitneyy760", "NunezJays6", "StrongKimi9",
+	    "AguilarBethz0112", "PearlyVictoriad36", "BarreraNicolasi9794", "CurtisTammyd365",
+	    "KrauseStanleye9471", "WrightCarolj3938", "BlairMorganm5", "SnowKarin54",
+	    "MagentaDalej4", "EvansStephenq881", "VelasquezTotorop528", "BonillaMelaniev60",
+	    "ArcherRicardoi8", "MortonKaylao1237", "MullenBillyy5", "JuarezMorganf39",
+	    "GatesNancys92", "MagnoliaSarax9588", "CopelandDylanw123", "HernandezCherylf8",
+	    "MacdonaldWesleyi83", "BallardAliciav7264", "CeruleanSydneyr29", "MaloneOctopix3"
 	}
+
 
   
 }
