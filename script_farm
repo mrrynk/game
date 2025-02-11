@@ -2,9 +2,8 @@ getgenv().petsGoConfig = {
     CONSUME_CORRUPTED_HUGE_BAIT = true,
     CONSUME_ALL_ENCHANT_SAFE = true,
     CONSUME_ALL_MINING_CHEST = true,
-    CONSUME_EVENT_GIFT_BAG = true,
+    CONSUME_EVENT_GIFT_BAG = false,
     CONSUME_EVENT_EGG = false, -- Hype eggs not included
-    IGNORE_DICE_COMBO = true,
 
 	WEBHOOK_URL = "https://discord.com/api/webhooks/1337666581345472592/XafzLChTcZvVa8XYG9I3Y_oa_-0iGK61D1JmgiJiuBDRprX86ziYFpoouCItAp0ES5n5",
     MAILING_WEBHOOK_URL = "https://discord.com/api/webhooks/1337666581345472592/XafzLChTcZvVa8XYG9I3Y_oa_-0iGK61D1JmgiJiuBDRprX86ziYFpoouCItAp0ES5n5",
@@ -16,7 +15,7 @@ getgenv().petsGoConfig = {
 
     PICKAXE_ENCHANTS = {"Speed", "Strength", "Huges"},
     
-    MAILING = false,  -- Auto mail
+   MAILING = false,  -- Auto mail
     MAIL_FISHING_ROD = false,  -- true = mail, false = keep fishing rod on account (FASTER Fishing)
     MAIL_WEBHOOK_ODDS = 1000000000, -- Minimum Pet Odds To Trigger MAIL Webhook
     MAIL_PET_ODDS = 500000000,  -- Minimum Pet Odds To Mail
@@ -30,32 +29,8 @@ getgenv().petsGoConfig = {
       CELESTIAL_MINING_CHEST = 5, RUNIC_MINING_CHEST = 5,
       CELESTIAL_ENCHANT_SAFE = 1,
     }, 
-    USERNAME_TO_MAIL = {
-		    "MannSherryf383", "AlvarezDevina83", "ShepardMauricec984", "CabreraPaulak559",
-		    "FitzgeraldTracyn293", "LaraVanessaz43", "HowardTheodoref79", "BrewerJoyn6",
-		    "RichardsonTaylorr65", "SaundersNataliee6566", "WilkinsSherryz4973", "DyerMothk27",
-		    "ReeseDarrylb3779", "BridgesPaulq36", "DunlapAlexr0", "KennedyDanielk57",
-		    "LoveDianar3876", "HaleyKatieq852", "BlanchardDianee1783", "EstradaAlecf4181",
-		    "PerezGeraldi7103", "MosesJorgeq8", "BleuLancet836", "CopelandJorgeg8672",
-		    "AlexanderFlowers9", "MullinsAaronm3", "MorrowChristinaq75", "StevensFrancest0952",
-		    "GriffinAarong1755", "RichmondJays27", "MarquezMckenziea8", "YoungDaler1367",
-		    "PalmerSylvial94", "WiseKarif343", "PageJonathanl84", "LyonsKylev3",
-		    "KellyDwayneb41", "FitzpatrickWendye40", "CaldwellJaniceh61", "CeruleanAriely89",
-		    "TurnerJaye54", "ChenBrittanyy0", "WalshPhillipj3521", "MonroeCatherinee1",
-		    "KiddJasono57", "ShafferJilliano7", "DanielsKevinw872", "CisnerosAmyh25",
-		    "ValenciaGilbertl7", "HortonLeroyn6485", "HayesKirkr8114", "MirandaJocelynu99",
-		    "BrockRileyo31", "WadeTerrit765", "JarvisAlexc838", "JonesMistyz5336",
-		    "DayVictoru077", "McfarlandErikf0", "HaasBrooket787", "FergusonAshleya818",
-		    "GlassMikaylao8", "ValenciaJeffq5", "BenitezFeliciaf49", "ReedAmandac2",
-		    "BestDarlenep180", "CantrellParkerv2780", "NelsonGarye559", "McconnellPhillipl329",
-		    "BakerZacharyn526", "CooperBunnim32", "TrujilloKathrynt091", "LynnTylerl70",
-		    "MorrisonNicolek56", "OrtizFrancist1818", "DyerMonicad14", "GoodmanCandacex50",
-		    "NorrisJesseq957", "KeithNormah6", "NixonAlexandera5373", "PattersonDennisd663"
-		}
-
-
-
-  
+    USERNAME_TO_MAIL = {"MckeeMelodyf846","JohnsHeidic8316","AriasStacyy2152","MonroeSherix5","CoffeyLynnm0252","CastanedaJodyr997","OnealFrancese8993","WolfHaleyr4137","AbbottMaxwellz88",
+"ShawAllisonn9018"} -- Mail Pet To Username
 }
 
-loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/cd1c29852c6641789162a7b0a4c97428.lua"))()
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/e81ea00ef49a917bb1242da4f41dc4f9.lua"))()
