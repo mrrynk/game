@@ -15,7 +15,7 @@ getgenv().petsGoConfig = {
 
     PICKAXE_ENCHANTS = {"Speed", "Strength", "Huges"},
     
-    MAILING = false,  -- Auto mail
+    MAILING = true,  -- Auto mail
     MAIL_FISHING_ROD = false,  -- true = mail, false = keep fishing rod on account (FASTER Fishing)
     MAIL_WEBHOOK_ODDS = 1000000000, -- Minimum Pet Odds To Trigger MAIL Webhook
     MAIL_PET_ODDS = 500000000,  -- Minimum Pet Odds To Mail
@@ -30,17 +30,17 @@ getgenv().petsGoConfig = {
       CELESTIAL_ENCHANT_SAFE = 1,
     }, 
     USERNAME_TO_MAIL = {
-		    "MartinKaitlynf660", "BookerTonyd8", "HooverSelenae65", "HooperJoshuax91",
-		    "HornRobertai6353", "BarrMelaniep04", "LozanoKristix11", "CrossChriso41",
-		    "BentonColinc8960", "MccartyJefferym1323", "MaxwellHannahj28", "TownsendGailx08",
-		    "BeanMonicas054", "MorenoDominicp9", "GriffinJoanneg3", "BakerAudreyk019",
-		    "JacobsonRandallp9097", "CherryLaurens4827", "FisherClaudiam5070", "PachecoMargarety147",
-		    "MonroeLaceyx6111", "NelsonStephanies7", "SilvaTashan1416", "CraneMikaylam07",
-		    "ReyesTonyz97", "BryantMikek6977", "JacksonBrendar90", "YatesRonaldd9682",
-		    "SalasTamiz89", "StricklandBryang3", "GlennBrendao021", "GutierrezJoshuav1",
-		    "HudsonNeilb312", "PatelRileyn49", "BauerSherryk91", "ObrienAngiee0",
-		    "MoodyBobbyv39", "KennedyFrancesh5581", "PurpleJimd68", "HoodCactie74"
-		}
+	    "HardingDarryle5474", "StaffordKaylat0", "CarpenterSherrir8", "CalderonTheresap446",
+	    "HooperJimp9073", "DrakeMikey38", "ParkerCherylz80", "WilsonLinday9551",
+	    "BurgundyMakaylaa048", "FlemingJudyr0773", "NolanBrandiv3", "SilverDylanc3",
+	    "GoldRobyni8954", "KrauseTaylora2", "FreemanKennethe15", "ReynoldsDebraf7",
+	    "ApricotPigleth7846", "WisteriaWarreng049", "HarmonLavenderr31", "NguyenGarrettr767",
+	    "HamptonJessicar948", "SandersDeborahs02", "SnowHibiscust5", "GonzalesLuise0625",
+	    "JohnstonCarmena4839", "CoxBrandonf4647", "FloresLaurag7", "MauveJoannah60",
+	    "BarkerHowardy908", "BeltranBrandonb5", "RandolphDominick5", "CalderonAngelax703",
+	    "RandallMaryi8910", "BurgessTanyaf8", "JimenezJosea7", "RubioKatherined5",
+	    "GreeneKellik3050", "RayFlowerd93", "BellJennag48", "EllisTheresah8"
+	}
 
 }
 
