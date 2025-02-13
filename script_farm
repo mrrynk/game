@@ -30,17 +30,21 @@ getgenv().petsGoConfig = {
       CELESTIAL_ENCHANT_SAFE = 1,
     }, 
     USERNAME_TO_MAIL = {
-	    "HardingDarryle5474", "StaffordKaylat0", "CarpenterSherrir8", "CalderonTheresap446",
-	    "HooperJimp9073", "DrakeMikey38", "ParkerCherylz80", "WilsonLinday9551",
-	    "BurgundyMakaylaa048", "FlemingJudyr0773", "NolanBrandiv3", "SilverDylanc3",
-	    "GoldRobyni8954", "KrauseTaylora2", "FreemanKennethe15", "ReynoldsDebraf7",
-	    "ApricotPigleth7846", "WisteriaWarreng049", "HarmonLavenderr31", "NguyenGarrettr767",
-	    "HamptonJessicar948", "SandersDeborahs02", "SnowHibiscust5", "GonzalesLuise0625",
-	    "JohnstonCarmena4839", "CoxBrandonf4647", "FloresLaurag7", "MauveJoannah60",
-	    "BarkerHowardy908", "BeltranBrandonb5", "RandolphDominick5", "CalderonAngelax703",
-	    "RandallMaryi8910", "BurgessTanyaf8", "JimenezJosea7", "RubioKatherined5",
-	    "GreeneKellik3050", "RayFlowerd93", "BellJennag48", "EllisTheresah8"
+	    "WalterDannyb6078", "JenningsRodneyk91", "CantuTroyu69", "CantuJimm72",
+	    "CarsonGeorgel24", "StanleyYvettea6948", "SimpsonWilliamj8", "CaldwellBrendanm9",
+	    "GarrisonKristal004", "GrayGreggw5267", "SpenceJoex025", "CarpenterSonian14",
+	    "LopezRalphu40", "JacobsConnore8", "SawyerWillowo7306", "ValenciaJacko23",
+	    "HuberMichaelc3671", "ContrerasKirkk5476", "MullenLaureny254", "CampbellCarolinet195",
+	    "KaiserCarriet8547", "SpenceIsaacd9757", "MayerDarreno96", "OrozcoPoohw254",
+	    "NealAdrianan787", "SchultzKellye9727", "BryantAndrean9", "CarneyWilliem6",
+	    "BrassVictoriax2", "GreenCathyv6500", "JohnstonRicardos0899", "BryanJop72",
+	    "WaltonJayg66", "AllenChristopherr384", "McbrideJohnnyq0", "PooleXaviero18",
+	    "SchmidtErikaz798", "FisherFoxi4", "WellsHowardh985", "HughesWesleyb0207",
+	    "RandolphTristany364", "LavenderBrianay41", "MorseAnnz371", "HaneyPurra9619",
+	    "JimenezTheodorep5", "GarciaMatthewr2829", "NicholsTracyt3868", "MoranBrittanyu2",
+	    "ReynoldsAlicei432", "RuizMikef08"
 	}
+
 
 }
 
