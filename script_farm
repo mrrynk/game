@@ -30,20 +30,19 @@ getgenv().petsGoConfig = {
       CELESTIAL_ENCHANT_SAFE = 1,
     }, 
     USERNAME_TO_MAIL = {
-	    "WalterDannyb6078", "JenningsRodneyk91", "CantuTroyu69", "CantuJimm72",
-	    "CarsonGeorgel24", "StanleyYvettea6948", "SimpsonWilliamj8", "CaldwellBrendanm9",
-	    "GarrisonKristal004", "GrayGreggw5267", "SpenceJoex025", "CarpenterSonian14",
-	    "LopezRalphu40", "JacobsConnore8", "SawyerWillowo7306", "ValenciaJacko23",
-	    "HuberMichaelc3671", "ContrerasKirkk5476", "MullenLaureny254", "CampbellCarolinet195",
-	    "KaiserCarriet8547", "SpenceIsaacd9757", "MayerDarreno96", "OrozcoPoohw254",
-	    "NealAdrianan787", "SchultzKellye9727", "BryantAndrean9", "CarneyWilliem6",
-	    "BrassVictoriax2", "GreenCathyv6500", "JohnstonRicardos0899", "BryanJop72",
-	    "WaltonJayg66", "AllenChristopherr384", "McbrideJohnnyq0", "PooleXaviero18",
-	    "SchmidtErikaz798", "FisherFoxi4", "WellsHowardh985", "HughesWesleyb0207",
-	    "RandolphTristany364", "LavenderBrianay41", "MorseAnnz371", "HaneyPurra9619",
-	    "JimenezTheodorep5", "GarciaMatthewr2829", "NicholsTracyt3868", "MoranBrittanyu2",
-	    "ReynoldsAlicei432", "RuizMikef08"
+	    "FriedmanJacksonn0524", "HopkinsGracef50", "MaddoxWaynec576", "HollandAaronk526",
+	    "GilesSharim0", "ChurchGreggw2201", "MossAaronm76", "ZamoraNathaniely016", "HurleyTammyf3",
+	    "ArroyoBetha197", "HullDaisyi4862", "GoodAaronl6", "WilliamsWhitneyk0130", "ThompsonNicolasp435",
+	    "CainGregm9218", "HensonPinea76", "HaynesJuanh90", "ArmstrongTracyc2993", "SavagePinen0289",
+	    "GloverBamboom5", "NielsenMarcusm8075", "VividJoshuai3433", "KaufmanJerryh8", "McphersonDebbied039",
+	    "MelendezAnnettek8797", "WagnerMadisonj95", "SnowCarolinef193", "JuarezJosephw0", "HopkinsWilliaml9",
+	    "ChavezSuzanneq7476", "AquaJackies212", "DonovanJuano41", "PatrickAlicej6220", "RodgersBettyh2",
+	    "LarsenConniex5198", "MurrayPamp7", "HamptonSues3216", "ShawMadisono9767", "MckeeStacyn060",
+	    "ThompsonJohnd040", "CruzMikea3", "BranchIvyg6", "CampbellNarwhalk0", "CarrollTammiey52", 
+	    "HuynhFroggyv381", "WilkinsonSavannahb9", "AustinAzaleai7343", "PruittDonaldo2060", "ZavalaFlowerl4",
+	    "SullivanNataliec6190"
 	}
+
 
 
 }
