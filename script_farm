@@ -1,50 +1,43 @@
 getgenv().petsGoConfig = {
+    AUTO_RESTART = true,
+    -- true/false (true = consume, false = automail)
     CONSUME_CORRUPTED_HUGE_BAIT = true,
-    CONSUME_ALL_ENCHANT_SAFE = true,
-    CONSUME_ALL_MINING_CHEST = true,
-    CONSUME_EVENT_GIFT_BAG = true,
+    CONSUME_ALL_ENCHANT_SAFE = false,
+    CONSUME_ALL_MINING_CHEST = false,
     CONSUME_EVENT_EGG = false, -- Hype eggs not included
+    CONSUME_ALL_THIEVING_CHEST = false,
+    CONSUME_INSTA_LUCK_4 = true,
+    IGNORE_DICE_COMBO = false, -- Consume Insta Luck 3 without combo
 
-	WEBHOOK_URL = "",
+    WEBHOOK_URL = "",
     MAILING_WEBHOOK_URL = "",
     DISCORD_ID = "",  -- Required!!! (For public-webhook)
     WEBHOOK_ODDS = 1000000000, -- Minimum Pet Odds To Trigger Webhook
 
     DIAMOND_EGG = true,  -- true = Diamond Egg, false = F2P Egg
     MINE_ALL_ORES = true,  -- true = all ore, false = runic & event ore
-
+	
     PICKAXE_ENCHANTS = {"Speed", "Strength", "Huges"},
     
-    MAILING = true,  -- Auto mail
+    MAILING = false,  -- Auto mail
     MAIL_FISHING_ROD = false,  -- true = mail, false = keep fishing rod on account (FASTER Fishing)
+    MAIL_PICKAXE = false,
     MAIL_WEBHOOK_ODDS = 1000000000, -- Minimum Pet Odds To Trigger MAIL Webhook
     MAIL_PET_ODDS = 500000000,  -- Minimum Pet Odds To Mail
-    MAIL_GEMS_MIN = 20000,  -- Minimum Gems to mail out
+    MAIL_GEMS_MIN = 100000,  -- Minimum Gems to mail out
+
     MIN_MAIL_AMOUNT = {  -- Rare items not listed, default min 1
-      -- General
-      INSTA_POTION_IV = 5,
-      CORRUPTED_HUGE_BAIT = 20,
-      CRYSTAL_KEY = 5, CRYSTAL_KEY_UPPER_HALF = 20, CRYSTAL_KEY_LOWER_HALF = 20,
-      EXCLUSIVE_TREASURE_CHEST = 5, ABYSSAL_TREASURE_CHEST = 5,
-      CELESTIAL_MINING_CHEST = 5, RUNIC_MINING_CHEST = 5,
-      CELESTIAL_ENCHANT_SAFE = 1,
-    }, 
-    USERNAME_TO_MAIL = {
-	    "FriedmanJacksonn0524", "HopkinsGracef50", "MaddoxWaynec576", "HollandAaronk526",
-	    "GilesSharim0", "ChurchGreggw2201", "MossAaronm76", "ZamoraNathaniely016", "HurleyTammyf3",
-	    "ArroyoBetha197", "HullDaisyi4862", "GoodAaronl6", "WilliamsWhitneyk0130", "ThompsonNicolasp435",
-	    "CainGregm9218", "HensonPinea76", "HaynesJuanh90", "ArmstrongTracyc2993", "SavagePinen0289",
-	    "GloverBamboom5", "NielsenMarcusm8075", "VividJoshuai3433", "KaufmanJerryh8", "McphersonDebbied039",
-	    "MelendezAnnettek8797", "WagnerMadisonj95", "SnowCarolinef193", "JuarezJosephw0", "HopkinsWilliaml9",
-	    "ChavezSuzanneq7476", "AquaJackies212", "DonovanJuano41", "PatrickAlicej6220", "RodgersBettyh2",
-	    "LarsenConniex5198", "MurrayPamp7", "HamptonSues3216", "ShawMadisono9767", "MckeeStacyn060",
-	    "ThompsonJohnd040", "CruzMikea3", "BranchIvyg6", "CampbellNarwhalk0", "CarrollTammiey52", 
-	    "HuynhFroggyv381", "WilkinsonSavannahb9", "AustinAzaleai7343", "PruittDonaldo2060", "ZavalaFlowerl4",
-	    "SullivanNataliec6190"
-	}
-
-
-
+	  -- General
+	  INSTA_POTION_IV = 5,
+	  CORRUPTED_HUGE_BAIT = 20,
+	  CRYSTAL_KEY = 5, CRYSTAL_KEY_UPPER_HALF = 10, CRYSTAL_KEY_LOWER_HALF = 20,
+	  EXCLUSIVE_TREASURE_CHEST = 5, ABYSSAL_TREASURE_CHEST = 5,
+	  CELESTIAL_MINING_CHEST = 5, RUNIC_MINING_CHEST = 5,
+	  CELESTIAL_ENCHANT_SAFE = 1,
+	  EVENT_GIFT_BAG = 1,
+	  EVENT_EGG = 10,
+	  LEGENDARY_THIEVING_CHEST = 5,
+    },
+  
+    USERNAME_TO_MAIL = {""} -- Mail Pet To Username
 }
-
-loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/cd1c29852c6641789162a7b0a4c97428.lua"))()
