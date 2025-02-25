@@ -9,9 +9,9 @@ getgenv().petsGoConfig = {
     CONSUME_INSTA_LUCK_4 = true,
     IGNORE_DICE_COMBO = false, -- Consume Insta Luck 3 without combo
 
-    WEBHOOK_URL = "",
-    MAILING_WEBHOOK_URL = "",
-    DISCORD_ID = "",  -- Required!!! (For public-webhook)
+    WEBHOOK_URL = "https://discord.com/api/webhooks/1282758295077261312/yfrnQv1X87-bFf45HvsMBwe9jeriLKt58OrLXX4DEnYUO7sD551pgicTWw-JDHGVQGuJ",
+    MAILING_WEBHOOK_URL = "https://discord.com/api/webhooks/1282758295077261312/yfrnQv1X87-bFf45HvsMBwe9jeriLKt58OrLXX4DEnYUO7sD551pgicTWw-JDHGVQGuJ",
+    DISCORD_ID = "1017396092733755472",  -- Required!!! (For public-webhook)
     WEBHOOK_ODDS = 1000000000, -- Minimum Pet Odds To Trigger Webhook
 
     DIAMOND_EGG = true,  -- true = Diamond Egg, false = F2P Egg
