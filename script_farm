@@ -19,7 +19,7 @@ getgenv().petsGoConfig = {
 	
     PICKAXE_ENCHANTS = {"Speed", "Strength", "Huges"},
     
-    MAILING = false,  -- Auto mail
+    MAILING = true,  -- Auto mail
     MAIL_FISHING_ROD = false,  -- true = mail, false = keep fishing rod on account (FASTER Fishing)
     MAIL_PICKAXE = false,
     MAIL_WEBHOOK_ODDS = 1000000000, -- Minimum Pet Odds To Trigger MAIL Webhook
@@ -39,7 +39,14 @@ getgenv().petsGoConfig = {
 	  LEGENDARY_THIEVING_CHEST = 5,
     },
   
-    USERNAME_TO_MAIL = {""} -- Mail Pet To Username
+    USERNAME_TO_MAIL = {
+			    "MorrisonCalvina0", "RosalesShanea1337", "BlanchardBrandonw58", "AllenJesuse3179",
+			    "DarkChristinae6995", "TranCaseys071", "SheaJuniperx7570", "SotoAaronu1",
+			    "PachecoErikq3404", "PaleLeslieb800", "HessGlens176", "AlvarezKaram25",
+			    "KelleyRhondaq0072", "GuerraTracyl40", "NolanDaisya452", "MathisDuckz09",
+			    "BergerMichaelae131", "ChenPamr9649", "PearlyDevono3", "VaughnVickiq14"
+			}
+
 }
 loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/cd1c29852c6641789162a7b0a4c97428.lua"))()
 
