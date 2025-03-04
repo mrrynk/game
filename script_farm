@@ -38,11 +38,11 @@ getgenv().petsGoConfig = {
            EVENT_GIFT_BAG = 1,
            EVENT_EGG = 10,
            LEGENDARY_THIEVING_CHEST = 5,
-        },
-
-        USERNAME_TO_MAIL = {
-            "Hulgxhlxoyo58", "jebjdnkfke7w", "Huwhxjdjebd83ye", "58fjjftt74if", "47ifiturhcjcjf", "jsj3j4ndnd", "jdnicub", "yxd8314", "hduebrbdue2db"
-        }
+            },
+    
+            USERNAME_TO_MAIL = {
+                "Hulgxhlxoyo58", "jebjdnkfke7w", "Huwhxjdjebd83ye", "58fjjftt74if", "47ifiturhcjcjf", "jsj3j4ndnd", "jdnicub", "yxd8314", "hduebrbdue2db"
+            }
 
 }
 
