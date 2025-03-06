@@ -20,7 +20,7 @@ getgenv().petsGoConfig = {
     
     PICKAXE_ENCHANTS = {"Speed", "Strength", "Huges"},
     
-    MAILING = false,  -- Auto mail
+    MAILING = true,  -- Auto mail
     MAIL_FISHING_ROD = false,  -- true = mail, false = keep fishing rod on account (FASTER Fishing)
     MAIL_PICKAXE = false,
     MAIL_WEBHOOK_ODDS = 1000000000, -- Minimum Pet Odds To Trigger MAIL Webhook
