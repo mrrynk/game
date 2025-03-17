@@ -9,9 +9,9 @@ getgenv().petsGoConfig = {
     CONSUME_KRAKEN_TENTACLE = true,
     CONSUME_BUCKET_O_CHUM = true,
 
-    WEBHOOK_URL = "",
-    MAILING_WEBHOOK_URL = "",
-    DISCORD_ID = "",
+    WEBHOOK_URL = "https://discord.com/api/webhooks/1337666581345472592/XafzLChTcZvVa8XYG9I3Y_oa_-0iGK61D1JmgiJiuBDRprX86ziYFpoouCItAp0ES5n5",
+    MAILING_WEBHOOK_URL = "https://discord.com/api/webhooks/1337666581345472592/XafzLChTcZvVa8XYG9I3Y_oa_-0iGK61D1JmgiJiuBDRprX86ziYFpoouCItAp0ES5n5",
+    DISCORD_ID = "1017396092733755472",
     WEBHOOK_ODDS = 1000000000, -- Minimum Pet Odds To Trigger Webhook
 
     DIAMOND_EGG = true,  -- true = Diamond Egg, false = F2P Egg
