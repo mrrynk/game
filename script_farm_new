@@ -1,1 +1,30 @@
-
+getgenv().Settings = {        
+    ["Notifications"] = {
+        Webhook = "https://discord.com/api/webhooks/1361349840130539540/q1Ml1qxmM9b2ZOtfrFWfursB36ONsDKm0LBHjBYqBilocd9gAN3Zs2dR1bGka1jHppdS",
+        DiscordID = "846408418389655572",
+        Difficulty = "Above 100m",
+    },
+    ["Mailing"] = {
+        USERNAME_TO_MAIL = {
+	    "remingtonss45", "remingtonss46", "remingtonss47", "remingtonss48", "remingtonss49", "remingtonss50", "remingtonss51", "remingtonss52", "remingtonss53", "remingtonss54", "remingtonss55", "remingtonss56a", "remingtonss57", "remingtonss58", "remingtonss59", "remingtonss60",
+	    "remingtonss61", "remingtonss62", "remingtonss63", "remingtonss64", "remingtonss65", "remingtonss66", "remingtonss68", "remingtonss69", "remingtonss70", "lecutepro9", "hysnxjdnhs", "5iifdeyvdtuh", "llhhvtcs46ub", "mnvhjf6uhf", "akhailong1", "akhailong3", "akhailong4",
+	    "akhailong5", "hoanganh9482", "hoanganh6502", "hoanganh7352", "hoanganh6252", "hoanganh9248", "phailong4g", "aphailong4g", "aphailong3g", "phailong211", "phailongp1"
+	},
+        Webhook = "",
+        ["Pets"] = {
+            KeepBestPets = false,
+            Difficulty = "Above 1b",
+        },
+        ["Items"] = {
+            --// These are EXAMPLES, please change/add anything to your liking! (Display Names) \\--
+            ["Exotic Mining Chest"] = {Amount = 1},
+            ["Runic Mining Chest"] = {Amount = 1},
+            ["Abyssal Treasure Chest"] = {Amount = 1},
+            ["Instant Luck Potion 4"] = {Amount = 1},
+            ["Valentines Spinny Wheel Ticket"] = {Amount = 1} 
+        },
+    },
+    ["Debug"] = {
+    },
+}
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/3cb1834cff48e9af0cc2616e44ab7d70.lua"))()
