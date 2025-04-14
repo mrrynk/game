@@ -2,22 +2,21 @@ getgenv().Settings = {
     ["Notifications"] = {
         Webhook = "https://discord.com/api/webhooks/1361349840130539540/q1Ml1qxmM9b2ZOtfrFWfursB36ONsDKm0LBHjBYqBilocd9gAN3Zs2dR1bGka1jHppdS",
         DiscordID = "846408418389655572",
-        Difficulty = "Above 1b",
+        Difficulty = "Above 1000m",
     },
     ["Mailing"] = {
-        USERNAME_TO_MAIL = {"lecutepro9"},
+        Usernames = {"lecutepro9"},
         Webhook = "",
         ["Pets"] = {
-            KeepBestPets = false,
-            Difficulty = "Above 1b",
+            KeepBestPets = true,
+            Difficulty = "Above 1000m",
         },
         ["Items"] = {
-            --// These are EXAMPLES, please change/add anything to your liking! (Display Names) \\--
-            ["Exotic Mining Chest"] = {Amount = 1},
-            ["Runic Mining Chest"] = {Amount = 1},
-            ["Abyssal Treasure Chest"] = {Amount = 1},
-            ["Instant Luck Potion 4"] = {Amount = 1},
-            ["Valentines Spinny Wheel Ticket"] = {Amount = 1} 
+            --// These are EXAMPLES, please change/add anything to your liking! \\--
+            ["Diamond Fishing Rod"] = {Amount = 1},
+            ["Magma Egg"] = {Amount = 10},
+            ["Runic Mining Chest"] = {Amount = 5},
+            ["Exclusive Fishing Bait"] = {Amount = 10},
         },
     },
     ["Debug"] = {
