@@ -29,10 +29,6 @@ getgenv().gagConfig = {
     OPEN_ALL_SEED_PACK = true,
 	BUY_COSMETIC_SHOP = { ["Cooking Kit"] = 3 },
 
-    -- MAX_PLANTS = 450,
-    -- DESTROY_UNTIL_MIN_PLANTS = 400,
-    -- DELETE_PLANTS_AFTER_MAX = { "Carrot", "Strawberry", "Blueberry", "Tomato", "Apple" },
-    
     BUY_EGGS = { "Bug Egg", "Bee Egg", "Paradise Egg", "Zen Egg"},
     PLANT_EGGS = { "Fall Egg", "Paradise Egg", "Anti Bee Egg", "Gourmet Egg", "Enchanted Egg", "Corrupted Zen Egg", "Zen Egg", "Dinosaur Egg", "Primal Egg", "Night Egg", "Oasis Egg", "Sprout Egg"},
     
