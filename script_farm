@@ -30,6 +30,7 @@ getgenv().gagConfig = {
     SKIP_HARVEST_MUTATIONS = {},  -- Stop Harvest
 
     KEEP_PETS = { 
+			"Swan",
 			"Phoenix",
 			"Cockatrice",
 			"Griffin",
@@ -85,6 +86,7 @@ getgenv().gagConfig = {
     PET_WEBHOOK_URL = "https://discord.com/api/webhooks/1409410321399021608/kdn0L5vVLAK5Tud-rVd-dYDq0AwrXLF33dbkGbjB0TunwY4Z_40ND7C1rawtYRxFQWBx",
     SEED_WEBHOOK_URL = "", 
     NOTIFY_PETS = {
+				"Swan",
 				"Phoenix",
 				"Cockatrice",
 				"Kitsune",
