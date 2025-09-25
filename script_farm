@@ -4,6 +4,7 @@ getgenv().gagConfig = {
     BUY_TRAVELING_MERCHANT = { "Bee Egg", "Paradise Egg", "Loquat", "Feijoa", "Pitcher Plant", "Common Summer Egg", "Rare Summer Egg" },
     BUY_EGGS = { "Rare Egg", "Bug Egg", "Bee Egg", "Paradise Egg", "Zen Egg"},
     MAX_QUEST_REROLL_SHECKLES = 48000001,
+	BUY_EVENT_SHOP = { "Red Panda", "Marmot", "Fall Egg", "Golden Acorn", "Sugar Glider", "Space Squirrel" },
 
     PLANT_EVENT_TREES = true,  -- This config will replace most plant related config
     PLACE_COSMETIC = { "Cooking Kit" },
