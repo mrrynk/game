@@ -93,7 +93,6 @@ getgenv().gagConfig = {
     NOTIFY_PETS = {
 				"Mizuchi",
 				"Tiger",
-				"Swan",
 				"Phoenix",
 				"Cockatrice",
 				"Kitsune",
