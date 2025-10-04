@@ -35,6 +35,8 @@ getgenv().gagConfig = {
     SKIP_HARVEST_MUTATIONS = {},  -- Stop Harvest
 
     KEEP_PETS = { 
+			"Fortune Squirrel", 
+			"Chinchilla", 
 			"Chubby Chipmunk",
 			"Mizuchi",
 			"Tiger",
@@ -92,6 +94,7 @@ getgenv().gagConfig = {
 	SHOW_PUBLIC_DISCORD_ID = false,
     SEED_WEBHOOK_URL = "", 
     NOTIFY_PETS = {
+				"Chinchilla", 
 				"Tiger",
 				"Phoenix",
 				"Cockatrice",
