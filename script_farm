@@ -79,7 +79,6 @@ getgenv().gagConfig = {
 
     EQUIP_PETS = { 
 		["Chubby Chipmunk"] = 1, 
-		["Rooster"] = 7 
 	},
     USE_PETS_FOR_UPGRADE_SLOT = { "Glimmering Sprite" },
     REMOVE_PET_MAX_UPGRADE = { "Glimmering Sprite", "Starfish" },  -- Unequip from garden
