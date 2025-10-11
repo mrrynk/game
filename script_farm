@@ -1,13 +1,11 @@
-setfpscap(3)
 getgenv().gagConfig = {
     BUY_TRAVELING_MERCHANT = { "Bee Egg", "Paradise Egg", "Loquat", "Feijoa", "Pitcher Plant" },
-    
+    BUY_EVENT_SHOP = { "Spooky Egg", "Reaper" },
     MAX_PLANTS = 100,
     DESTROY_UNTIL_MIN_PLANTS = 80,
     KEEP_SEEDS = { "Bone Blossom" },
     KEEP_SEEDS_AFTER_MAX_PLANTS = {},
 
-	
     PLACE_COSMETIC = { "Cooking Kit" },
     
     -- General:
@@ -21,8 +19,9 @@ getgenv().gagConfig = {
 
     BUY_COSMETIC_SHOP = { ["Cooking Kit"] = 3 },
     
-    BUY_EGGS = {  "Spooky Egg", "Rare Egg", "Jungle Egg", "Bug Egg", "Bee Egg", "Paradise Egg", "Zen Egg"},
-    PLANT_EGGS = {  "Spooky Egg", "Rare Egg", "Jungle Egg", "Fall Egg"},
+    BUY_EGGS = { "Spooky Egg", "Jungle Egg", "Bug Egg", "Bee Egg", "Paradise Egg", "Zen Egg"},
+    PLANT_EGGS = { "Spooky Egg" },
+    -- PLANT_EGGS = { "Spooky Egg", "Paradise Egg", "Jungle Egg", "Fall Egg", "Bug Egg"},
     
     BUY_SEED_SHOP = { "Crimson Thorn", "Romanesco", "Elder Strawberry", "Giant Pinecone", "Burning Bud", "Sugar Apple", "Ember Lily", "Beanstalk", "Cacao", "Pepper", "Mushroom", "Grape", "Mango", "Dragon Fruit", "Cactus", ["Coconut"] = 50, ["Bamboo"] = 50, ["Apple"] = 50, ["Pumpkin"] = 50, ["Watermelon"] = 50, ["Daffodil"] = 50, ["Corn"] = 50, ["Tomato"] = 50, ["Orange Tulip"] = 50, ["Blueberry"] = 50, ["Strawberry"] = 50, ["Carrot"] = 50 },
     KEEP_SEEDS = {},
@@ -33,7 +32,6 @@ getgenv().gagConfig = {
 
     KEEP_PETS = { 
 			"Headless Horseman",
-			"Reaper", 
 		 	"Fortune Squirrel", 
 			"Chinchilla",
 			"Chubby Chipmunk",
