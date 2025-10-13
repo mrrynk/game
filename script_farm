@@ -78,7 +78,6 @@ getgenv().gagConfig = {
 	BUY_ASCEND_SHOP = {"Egg Capacity Upgrade"},
 
     EQUIP_PETS = { 
-		"Chubby Chipmunk", 
 		"Rooster"
 	},
     USE_PETS_FOR_UPGRADE_SLOT = { "Glimmering Sprite" },
