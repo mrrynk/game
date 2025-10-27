@@ -1,7 +1,9 @@
 setfpscap(2)
 getgenv().gagConfig = {
     BUY_TRAVELING_MERCHANT = { "Bee Egg", "Paradise Egg", "Loquat", "Feijoa", "Pitcher Plant" },
-    BUY_EVENT_SHOP = { "Spooky Egg" },
+    BUY_EVENT_SHOP = { "Spooky Egg", "Spooky Chest"  },
+	DISABLE_REAPER_EVENT = false,
+
     MAX_PLANTS = 100,
     DESTROY_UNTIL_MIN_PLANTS = 80,
     KEEP_SEEDS = { "Bone Blossom" },
@@ -33,6 +35,8 @@ getgenv().gagConfig = {
     SKIP_HARVEST_MUTATIONS = {},  -- Stop Harvest
 
     KEEP_PETS = { 
+			"Lich", 
+			"Mummy", 
 			"Hex Serpent",
 		 	"Headless Horseman", 
 		 	"Reaper",
@@ -85,7 +89,7 @@ getgenv().gagConfig = {
 		{"Ghost Bear", 8, 1},
 		{"Rooster", 8, 2},
 	},
-	
+	LEVELUP_LOLLIPOP_MIN_LEVEL = 90,
     USE_PETS_FOR_UPGRADE_SLOT = { "Rooster" },
     REMOVE_PET_MAX_UPGRADE = { "Glimmering Sprite", "Starfish", "Robin", "Barn Owl" },  -- Unequip from garden
 
