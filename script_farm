@@ -1,10 +1,9 @@
 
 setfpscap(2)
 getgenv().gagConfig = {
-    BUY_TRAVELING_MERCHANT = { "Bee Egg", "Paradise Egg", "Loquat", "Feijoa", "Pitcher Plant" },
-    BUY_EVENT_SHOP = { "Spooky Egg", "Spooky Chest"  },
-	DISABLE_REAPER_EVENT = false,
-
+    BUY_TRAVELING_MERCHANT = { "Bee Egg", "Paradise Egg", "Fall Egg", "Loquat", "Feijoa", "Pitcher Plant" },
+	BUY_EVENT_SHOP = { "Safari Egg" },
+    DISABLE_REAPER_EVENT = false,
     MAX_PLANTS = 100,
     DESTROY_UNTIL_MIN_PLANTS = 80,
     KEEP_SEEDS = { "Bone Blossom" },
@@ -23,8 +22,8 @@ getgenv().gagConfig = {
 
     BUY_COSMETIC_SHOP = { ["Cooking Kit"] = 3 },
     
-    BUY_EGGS = { "Spooky Egg", "Jungle Egg", "Bug Egg", "Bee Egg", "Paradise Egg", "Zen Egg", "Rare Egg"},
-    PLANT_EGGS = { "Rare Egg", "Spooky Egg", "Paradise Egg", "Jungle Egg", "Bug Egg" },
+    BUY_EGGS = { "Safari Egg" ,"Spooky Egg", "Jungle Egg", "Bug Egg", "Bee Egg", "Paradise Egg", "Zen Egg", "Rare Egg"},
+    PLANT_EGGS = { "Safari Egg", "Rare Egg", "Spooky Egg", "Paradise Egg", "Jungle Egg", "Bug Egg" },
     -- PLANT_EGGS = {  "Spooky Egg", "Paradise Egg", "Jungle Egg", "Fall Egg", "Bug Egg"},
     
     BUY_SEED_SHOP = { "Great Pumpkin", "Crimson Thorn", "Romanesco", "Elder Strawberry", "Giant Pinecone", "Burning Bud", "Sugar Apple", "Ember Lily", "Beanstalk", "Cacao", "Pepper", "Mushroom", "Grape", "Mango", "Dragon Fruit", "Cactus", ["Coconut"] = 50, ["Bamboo"] = 50, ["Apple"] = 50, ["Pumpkin"] = 50, ["Watermelon"] = 50, ["Daffodil"] = 50, ["Corn"] = 50, ["Tomato"] = 50, ["Orange Tulip"] = 50, ["Blueberry"] = 50, ["Strawberry"] = 50, ["Carrot"] = 50 },
@@ -36,6 +35,7 @@ getgenv().gagConfig = {
     SKIP_HARVEST_MUTATIONS = {},  -- Stop Harvest
 
     KEEP_PETS = { 
+			"Elephant", 
 			"Lich", 
 			"Mummy", 
 			"Hex Serpent",
