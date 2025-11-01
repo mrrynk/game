@@ -74,7 +74,11 @@ getgenv().gagConfig = {
 			["Starfish"] = 8,
 			["Shiba Inu"] = 1,
 			["Blood Kiwi"] = 2,
-			["Rooster"] = 10
+			["Rooster"] = 10,
+			"Bunny", 
+			"Dog", 
+			"Deer", 
+			"Golden Lab"
 	},
     KEEP_PETS_WEIGHT = 5,
     KEEP_PETS_AGE = 60,
