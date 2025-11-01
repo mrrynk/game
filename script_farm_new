@@ -76,14 +76,7 @@ getgenv().gagConfig = {
 			["Shiba Inu"] = 1,
 			["Blood Kiwi"] = 2,
 			["Rooster"] = 10,
-			"Bunny", 
-			"Dog", 
-			"Deer", 
-			"Golden Lab",
-			"Chicken", 
-			"Flamingo", 
-			"Cat", 
-			"Black Bunny" 
+		
 	},
     KEEP_PETS_WEIGHT = 5,
     KEEP_PETS_AGE = 60,
