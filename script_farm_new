@@ -1,4 +1,6 @@
 
+
+
 setfpscap(2)
 getgenv().gagConfig = {
     BUY_TRAVELING_MERCHANT = { "Bee Egg", "Paradise Egg", "Fall Egg", "Loquat", "Feijoa", "Pitcher Plant" },
@@ -93,7 +95,7 @@ getgenv().gagConfig = {
 		{"Rooster", 8, 2},
 	},
 	LEVELUP_LOLLIPOP_MIN_LEVEL = 90,
-    USE_PETS_FOR_UPGRADE_SLOT = { "Bunny", "Dog", "Deer", "Golden Lab", "Chicken", "Flamingo", "Cat", "Black Bunny", "Flamingo", "Seal", "Dairy Cow", "Grey Mouse","Grizzly Bear", "Jackalope", "Monkey", "Orangutan", "Orange Tabby", "Pig", "Robin", "Sea Turtle" , "Sea Otter", "Silver Monkey", "Spotted Deer", "Squirrel", "Brown Mouse" },
+    USE_PETS_FOR_UPGRADE_SLOT = { "Bunny", "Dog", "Deer", "Golden Lab", "Chicken", "Flamingo", "Cat", "Black Bunny", "Flamingo", "Seal", "Dairy Cow", "Grey Mouse","Grizzly Bear", "Jackalope", "Monkey", "Orangutan", "Orange Tabby", "Pig", "Robin", "Sea Turtle" , "Sea Otter", "Silver Monkey", "Spotted Deer", "Squirrel", "Brown Mouse", "Seedling", "Badger" },
     REMOVE_PET_MAX_UPGRADE = { "Glimmering Sprite", "Starfish", "Robin", "Barn Owl" },  -- Unequip from garden
 
     BUY_GEAR_SHOP = { "Grandmaster Sprinkler", "Master Sprinkler", "Godly Sprinkler", "Advanced Sprinkler", "Basic Sprinkler", "Trading Ticket", "Watering Can", "Levelup Lollipop" },
