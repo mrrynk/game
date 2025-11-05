@@ -74,7 +74,6 @@ getgenv().gagConfig = {
 			["Ghost Bear"] = 8,
 			["Red Panda"] = 10,
 			["Drake"] = 5,
-			["Starfish"] = 8,
 			["Shiba Inu"] = 1,
 			["Blood Kiwi"] = 2,
 			["Rooster"] = 10,
