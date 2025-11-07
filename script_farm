@@ -38,7 +38,7 @@ getgenv().gagConfig = {
 
     KEEP_PETS = { 
 			"Hydra",
-			"Rhino",
+			"Rhino"  = 10,
 			"Elephant", 
 			"Lich", 
 			"Mummy", 
