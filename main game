@@ -1,5 +1,5 @@
 script_key = "JGgiVwzCzjlXGOOrVsrHRrdTYJVAUqBb";
-getgenv().GGFX_MODE = 1
+getgenv().GGFX_MODE = 2
 getgenv().GDO_HALLOWEEN_WORLD = true
 getgenv().GHALLOWEEN_WORLD_ALLOW_WORSE_EGG_PLACEMENT = true
 getgenv().GHALLOWEEN_WORLD_HATCH_SPOTS = 2
