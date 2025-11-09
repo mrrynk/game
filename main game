@@ -1,41 +1,131 @@
-setfpscap(10)
-script_key = "JGgiVwzCzjlXGOOrVsrHRrdTYJVAUqBb";
-getgenv().GGFX_MODE = 1
-getgenv().GDO_HALLOWEEN_WORLD = true
-getgenv().GHALLOWEEN_WORLD_ALLOW_WORSE_EGG_PLACEMENT = true
-getgenv().GHALLOWEEN_WORLD_HATCH_SPOTS = 2
-getgenv().GKEEP_CURRENCY_FOR_CRAFTS = "20m"
-getgenv().GHALLOWEEN_WORLD_USE_BOOSTS = true
-getgenv().GHALLOWEEN_WORLD_BUY_FROM_SPECIFIC_HOUSE = {1,2,3,4,5}
-getgenv().GHALLOWEEN_WORLD_BUY_FROM_HOUSES_BELOW = false
-getgenv().GHALLOWEEN_WORLD_RECIPES_TO_DO = {1,2,3,4}
-getgenv().GHALLOWEEN_JOIN_LOCAL = false
-getgenv().GHALLOWEEN_OPEN_HOUSE_6 = false
-getgenv().GALLOW_HOPPING = false
-getgenv().GZONE_TO = 1
-getgenv().GEVENT_UPGRADES = {
-  "HalloweenCandyMultiplier",
-  "HalloweenEggLuck",
-  "HalloweenTrickOrTreatLuck",
-  "HalloweenMoreDiamonds",
-  "HalloweenMoreWitchHats",
-  "HalloweenHugeLuck",
-  "HalloweenTitanicLuck"
+
+script_key="anzjDPeGYBzGNMCrGyChFxeemCzOGNEj";
+setfpscap(2)
+getgenv().gagConfig = {
+    BUY_TRAVELING_MERCHANT = { "Bee Egg", "Paradise Egg", "Fall Egg", "Loquat", "Feijoa", "Pitcher Plant" },
+  	BUY_EVENT_SHOP = { "Safari Egg", "Lion" },
+    DISABLE_REAPER_EVENT = false,
+    MAX_PLANTS = 100,
+    DESTROY_UNTIL_MIN_PLANTS = 80,
+    KEEP_SEEDS = { "Bone Blossom" },
+    KEEP_SEEDS_AFTER_MAX_PLANTS = {},
+    SUBMIT_SAFARI_JOE_PET = {"Giraffe", "Zebra", "Oxpecker"},
+    PLACE_COSMETIC = { "Cooking Kit" },
+    
+    -- General:
+    AUTO_UPDATE_RESTART = true,
+    REDEEM_CODES = {},
+    EXTRA_PET_SLOTS = 5,
+    EXTRA_EGG_SLOTS = 5,
+    MAX_REBIRTH_SHECKLES = 0,
+    ADD_FRIEND = true,
+    OPEN_ALL_SEED_PACK = true,
+	COLLECT_FRUIT_PER_SECOND = 3,
+
+    BUY_COSMETIC_SHOP = { ["Cooking Kit"] = 3 },
+    
+    BUY_EGGS = { "Safari Egg", "Spooky Egg", "Jungle Egg", "Bug Egg", "Bee Egg", "Paradise Egg", "Zen Egg", "Rare Egg"},
+    PLANT_EGGS = { "Safari Egg", "Rare Egg", "Spooky Egg", "Paradise Egg", "Jungle Egg", "Bug Egg" },
+    -- PLANT_EGGS = {  "Spooky Egg", "Paradise Egg", "Jungle Egg", "Fall Egg", "Bug Egg"},
+    
+    BUY_SEED_SHOP = { "Great Pumpkin", "Crimson Thorn", "Romanesco", "Elder Strawberry", "Giant Pinecone", "Burning Bud", "Sugar Apple", "Ember Lily", "Beanstalk", "Cacao", "Pepper", "Mushroom", "Grape", "Mango", "Dragon Fruit", "Cactus", ["Coconut"] = 50, ["Bamboo"] = 50, ["Apple"] = 50, ["Pumpkin"] = 50, ["Watermelon"] = 50, ["Daffodil"] = 50, ["Corn"] = 50, ["Tomato"] = 50, ["Orange Tulip"] = 50, ["Blueberry"] = 50, ["Strawberry"] = 50, ["Carrot"] = 50 },
+	
+	KEEP_SEEDS = {},
+    KEEP_SEEDS_AFTER_MAX_PLANTS = {},
+    
+    FAVOURITE_FRUIT_MUTATIONS = {},  -- Stop Autosell
+    SKIP_HARVEST_MUTATIONS = {},  -- Stop Harvest
+
+    KEEP_PETS = { 
+			"Hydra",
+			["Rhino"]  = 10,
+			"Elephant", 
+			"Lich", 
+			"Mummy", 
+		 	"Headless Horseman", 
+		 	"Reaper",
+		 	"Chicken Zombie", 
+			"Chinchilla",
+			"Chubby Chipmunk",
+			"Mizuchi",
+			"Tiger",
+			"Swan",
+			"Phoenix",
+			"Cockatrice",
+			"Griffin",
+			"Golden Goose",
+			"Lobster Thermidor",
+			"French Fry Ferret",
+			"Corrupted Kitsune",
+			"Kitsune",
+			"Dilophosaurus",
+			"Moon Cat",
+			"Spinosaurus",
+			"T-Rex",
+			"Disco Bee",
+			"Butterfly",
+			"Queen Bee",
+			"Dragonfly",
+			"Raccoon",
+			"Fennec Fox",
+			"Mimic Octopus",
+			"Red Fox",
+			"Blood Owl",
+			"Barn Owl",
+			["Ghost Bear"] = 8,
+			["Red Panda"] = 10,
+			["Drake"] = 5,
+			["Shiba Inu"] = 1,
+			["Blood Kiwi"] = 2,
+			["Rooster"] = 10,
+		
+	},
+    KEEP_PETS_WEIGHT = 5,
+    KEEP_PETS_AGE = 60,
+
+	-- test
+	EQUIP_PET_SHARD = { ["Glimmering Sprite"] = "Glimmering" },
+	MAX_REBIRTH_SHECKLES = 1_000_000_000_000_000,
+	BUY_ASCEND_SHOP = {"Egg Capacity Upgrade"},
+
+    
+    EQUIP_PETS = {
+		{"Ghost Bear", 8, 1},
+		{"Rooster", 8, 2},
+	},
+	LEVELUP_LOLLIPOP_MIN_LEVEL = 90,
+    USE_PETS_FOR_UPGRADE_SLOT = { "Rooster", "Bunny", "Dog", "Deer", "Golden Lab", "Chicken", "Flamingo", "Cat", "Black Bunny", "Flamingo", "Seal", "Dairy Cow", "Grey Mouse","Grizzly Bear", "Jackalope", "Monkey", "Orangutan", "Orange Tabby", "Pig", "Robin", "Sea Turtle" , "Sea Otter", "Silver Monkey", "Spotted Deer", "Squirrel", "Brown Mouse", "Seedling", "Badger" },
+    REMOVE_PET_MAX_UPGRADE = { "Glimmering Sprite", "Starfish", "Robin", "Barn Owl" },  -- Unequip from garden
+
+    BUY_GEAR_SHOP = { "Grandmaster Sprinkler", "Master Sprinkler", "Godly Sprinkler", "Advanced Sprinkler", "Basic Sprinkler", "Trading Ticket", "Watering Can", "Levelup Lollipop" },
+    USE_SPRINKLER = { "Basic Sprinkler", "Master Sprinkler", "Godly Sprinkler", "Advanced Sprinkler", "Grandmaster Sprinkler" },
+
+    PET_WEBHOOK_URL = "https://discord.com/api/webhooks/1409410321399021608/kdn0L5vVLAK5Tud-rVd-dYDq0AwrXLF33dbkGbjB0TunwY4Z_40ND7C1rawtYRxFQWBx",
+	SHOW_PUBLIC_DISCORD_ID = false,
+    SEED_WEBHOOK_URL = "", 
+    NOTIFY_PETS = {
+				"Elephant", 
+				"Hydra",
+		 		"Headless Horseman", 
+				"Phoenix",
+				"Cockatrice",
+				"Kitsune",
+				"Spinosaurus",
+				"T-Rex",
+				"Disco Bee",
+				"Butterfly",
+				"Mimic Octopus",
+				"Queen Bee",
+				"Fennec Fox",
+				"Dragonfly",
+				"Raccoon",
+				"Red Fox",
+				},
+    NOTIFY_PETS_WEIGHT = { ["Red Giant Ant"] = 10, ["Bear Bee"] = 10, ["Tanchozuru"] = 10 },
+    DISCORD_ID = "111zzz",
+    WEBHOOK_NOTE = "PCCC",
+    SHOW_WEBHOOK_USERNAME = true,
+    SHOW_WEBHOOK_JOBID = false,
 }
-getgenv().GWEBHOOK_USERID = "846408418389655572"
-getgenv().GWEBHOOK_LINK = "https://discord.com/api/webhooks/1434182295807328297/fVu2uiA0jzO-7hiJGYobXjSxaGLUknf-y4ePszlnG6bYriPzGA0JrHvYZD_RApAlsLiM"
-getgenv().GHUGE_COUNT = 0 -- amount of huges to keep/not mail
-getgenv().GMAIL_RECEIVERS = {"dinh1974"} 
-getgenv().GMAX_MAIL_COST = "2m" 
-getgenv().GMAIL_ITEMS = {
-["All Huges"] = {Class = "Pet", Id = "All Huges", MinAmount = 1},
-["Send Diamonds"] = {Class = "Currency", Id = "Diamonds", KeepAmount = "5m", MinAmount = "50m"}, -- mail diamonds, to enable lower MinAmount..
-["Hype Egg 2"] = {Class = "Lootbox", Id = "Hype Egg 2", MinAmount = 1},
-["Daycare egg 5"] = {Class = "Egg", Id = "Huge Machine Egg 5", MinAmount = 1},
-["Secret pet1"] = {Class = "Pet", Id = "Rainbow Swirl", MinAmount = 1, AllVariants = true},
-["Secret pet2"] = {Class = "Pet", Id = "Banana", MinAmount = 1, AllVariants = true},
-["Secret pet3"] = {Class = "Pet", Id = "Coin", MinAmount = 1, AllVariants = true},
-["Secret pet4"] = {Class = "Pet", Id = "Yellow Lucky Block", MinAmount = 1, AllVariants = true},
-["Brainrot egg"] = {Class = "Egg", Id = "Exclusive Egg 56", MinAmount = 1},
-}
-loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/6e75890d2e36b4613270666c4f5ccab3.lua"))()
+
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/c916e5b90dc37c71ecf1ec00dfce3d5d.lua"))()
