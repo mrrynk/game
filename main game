@@ -78,7 +78,7 @@ getgenv().gagConfig = {
 			["Drake"] = 5,
 			["Shiba Inu"] = 1,
 			["Blood Kiwi"] = 2,
-			["Rooster"] = 10,
+			-- ["Rooster"] = 10,
 		
 	},
     KEEP_PETS_WEIGHT = 5,
