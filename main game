@@ -24,7 +24,7 @@ getgenv().Config = {
     },
     SEND_DIAMONDS = {
         Usernames = { 'lawdiii'}, -- 'name1', 'name2', 'name3'
-        MinDiamonds = 150000000,
+        MinDiamonds = 100000000,
     },
     SEND_ITEM = { 
         Usernames = { 'lawdiii'}, ---'name1', 'name2', 'name3'
