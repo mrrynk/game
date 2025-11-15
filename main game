@@ -124,7 +124,7 @@ getgenv().gagConfig = {
         "Dairy Cow", "Grey Mouse", "Grizzly Bear", "Jackalope",
         "Monkey", "Orangutan", "Orange Tabby", "Pig", "Robin",
         "Sea Turtle", "Sea Otter", "Silver Monkey", "Spotted Deer",
-        "Squirrel", "Brown Mouse", "Seedling", "Badger"
+        "Squirrel", "Brown Mouse", "Seedling", "Badger", "Snail"
     },
 
     EXTRA_PET_INVENTORY_SLOTS = 5,
