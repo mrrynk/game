@@ -13,8 +13,8 @@ getgenv().gagConfig = {
         "Common Summer Egg", "Sprout Egg"
     },  -- <== THÊM DẤU PHẨY Ở ĐÂY
 
-    MAX_PLANTS = 250,
-    DESTROY_UNTIL_MIN_PLANTS = 180,
+    MAX_PLANTS = 50,
+    DESTROY_UNTIL_MIN_PLANTS = 40,
     KEEP_SEEDS = { "Bone Blossom" },
     KEEP_SEEDS_AFTER_MAX_PLANTS = {},
 
@@ -28,6 +28,7 @@ getgenv().gagConfig = {
     MAX_REBIRTH_SHECKLES = 0,
     ADD_FRIEND = true,
     OPEN_ALL_SEED_PACK = true,
+	COLLECT_FRUIT_PER_SECOND = 3,
 
     BUY_COSMETIC_SHOP = { ["Cooking Kit"] = 3 },
     
@@ -50,6 +51,7 @@ getgenv().gagConfig = {
     SKIP_HARVEST_MUTATIONS = {},     -- Stop Harvest
 
     KEEP_PETS = { 
+		"Goblin Miner",
         "Ruby Squid",
         "Diamond Panther",
         "Lion",
@@ -100,7 +102,7 @@ getgenv().gagConfig = {
         ["Rooster"] = 8
     },
 
-    KEEP_PETS_WEIGHT = 5,
+    KEEP_PETS_WEIGHT = 7,
     KEEP_PETS_AGE = 60,
 
     -- test
