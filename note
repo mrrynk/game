@@ -1,6 +1,6 @@
 local Plots = workspace:WaitForChild("Plots")
 
--- Hàm cố gắng convert "$50K/s" -> 50000 (cho dễ sort nếu cần)
+-- đổi "$50K/s" -> 50000 để sau này muốn sort thì dùng
 local suffixMul = {
     K = 1e3,
     M = 1e6,
@@ -9,61 +9,68 @@ local suffixMul = {
 }
 
 local function incomeToNumber(text)
-    -- bỏ $, /s, khoảng trắng, dấu phẩy
     local t = text:gsub("%$", ""):gsub("/s", ""):gsub(",", ""):gsub("%s+", "")
     local suffix = t:match("([KMBT])$")
 
     if suffix then
         local base = tonumber(t:sub(1, #t - 1))
         if not base then return nil end
-        local mul = suffixMul[suffix] or 1
-        return base * mul
+        return base * (suffixMul[suffix] or 1)
     else
         return tonumber(t)
     end
 end
 
--- Duyệt toàn bộ plot + podium
 for _, plot in ipairs(Plots:GetChildren()) do
     local podiumFolder = plot:FindFirstChild("AnimalPodiums")
     if podiumFolder then
         for _, podium in ipairs(podiumFolder:GetChildren()) do
-            -- kiếm BillboardGui AnimalOverhead
+            -- tìm BillboardGui AnimalOverhead
             local overhead = podium:FindFirstChild("AnimalOverhead", true)
             if overhead and overhead:IsA("BillboardGui") then
-
                 local incomeText
                 local nameText
 
-                -- quét các TextLabel bên trong
+                -- quét text bên trong overhead
                 for _, inst in ipairs(overhead:GetDescendants()) do
                     if inst:IsA("TextLabel") or inst:IsA("TextBox") then
                         local t = inst.Text or ""
-                        -- $xx/s  -> income
                         if t:match("%$.*%/s") then
-                            incomeText = t
-                        -- còn lại (không có $, không có /s) có thể là tên pet
+                            incomeText = t          -- ví dụ: $50K/s
                         elseif t ~= "" and not t:find("%$") and not t:find("/") then
-                            nameText = t
+                            nameText = t           -- đoán là tên pet
                         end
                     end
                 end
 
                 if incomeText then
                     local incomeNum = incomeToNumber(incomeText)
-                    -- lấy vị trí (center của Base hoặc bất kỳ part nào trong podium)
+
+                    -- tìm 1 BasePart để lấy Position
                     local pos
-                    local basePart = podium:FindFirstChild("Base", true)
-                        or podium:FindFirstChildWhichIsA("BasePart", true)
-                    if basePart then
-                        pos = basePart.Position
+                    local baseModel = podium:FindFirstChild("Base")
+                    local posPart
+
+                    if baseModel and baseModel:IsA("Model") then
+                        posPart = baseModel.PrimaryPart
+                            or baseModel:FindFirstChildWhichIsA("BasePart", true)
+                    elseif baseModel and baseModel:IsA("BasePart") then
+                        posPart = baseModel
+                    end
+
+                    if not posPart then
+                        posPart = podium:FindFirstChildWhichIsA("BasePart", true)
+                    end
+
+                    if posPart then
+                        pos = posPart.Position
                     end
 
                     print("==========")
                     print("Plot     :", plot.Name)
                     print("Podium   :", podium.Name)
                     print("Pet Name :", nameText or "(unknown)")
-                    print("Income   :", incomeText, incomeNum and("("..incomeNum..")") or "")
+                    print("Income   :", incomeText, incomeNum and "("..incomeNum..")" or "")
                     if pos then
                         print("Position :", pos)
                     end
