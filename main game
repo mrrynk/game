@@ -31,11 +31,7 @@ getgenv().gagConfig = {
 
     BUY_COSMETIC_SHOP = { ["Cooking Kit"] = 3 },
     
-    BUY_EGGS = { 
-        "Gem Egg", "Spooky Egg", "Jungle Egg", "Bug Egg", "Bee Egg",
-        "Paradise Egg", "Zen Egg", "Safari Egg", "Rare Egg",
-        ["Common Egg"] = 10
-    },
+    BUY_EGGS = { ["Common Egg"] = 10, "Jungle Egg", "Bug Egg", "Bee Egg", "Paradise Egg", "Mythical Egg", "Rare Summer Egg", "Common Summer Egg", "Rare Egg", "Uncommon Egg" },
 
     PLANT_EGGS = { "Gem Egg", "Safari Egg" },
     -- PLANT_EGGS = { "Paradise Egg", "Safari Egg", "Spooky Egg", "Jungle Egg" },
