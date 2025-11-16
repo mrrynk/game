@@ -1,6 +1,37 @@
-local Plots = workspace:WaitForChild("Plots")
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
 
--- đổi "$50K/s" -> 50000 để sau này muốn sort thì dùng
+-------------------------------------------------
+-- 1) LẤY LIST PET CẦN CHO REBIRTH
+-------------------------------------------------
+local requiredFolder = lp.PlayerGui
+    .Rebirth
+    .Rebirth
+    .Content
+    .Holder
+    .HolderImage
+    .RequiredCharacters
+
+local requiredPets = {}
+
+for _, inst in ipairs(requiredFolder:GetDescendants()) do
+    if inst:IsA("TextLabel") or inst:IsA("TextBox") then
+        local t = inst.Text or ""
+        -- thường tên pet là text không có $, không có /, không rỗng
+        if t ~= "" and not t:find("%$") and not t:find("/") then
+            requiredPets[t] = true
+        end
+    end
+end
+
+print("== PET REQUIRED REBIRTH ==")
+for name, _ in pairs(requiredPets) do
+    print(name)
+end
+
+-------------------------------------------------
+-- 2) HÀM ĐỔI "$50K/s" -> 50000 ĐỂ SORT
+-------------------------------------------------
 local suffixMul = {
     K = 1e3,
     M = 1e6,
@@ -9,73 +40,91 @@ local suffixMul = {
 }
 
 local function incomeToNumber(text)
+    if not text then return 0 end
     local t = text:gsub("%$", ""):gsub("/s", ""):gsub(",", ""):gsub("%s+", "")
     local suffix = t:match("([KMBT])$")
 
     if suffix then
         local base = tonumber(t:sub(1, #t - 1))
-        if not base then return nil end
+        if not base then return 0 end
         return base * (suffixMul[suffix] or 1)
     else
-        return tonumber(t)
+        return tonumber(t) or 0
     end
 end
 
-for _, plot in ipairs(Plots:GetChildren()) do
-    local podiumFolder = plot:FindFirstChild("AnimalPodiums")
-    if podiumFolder then
-        for _, podium in ipairs(podiumFolder:GetChildren()) do
-            -- tìm BillboardGui AnimalOverhead
-            local overhead = podium:FindFirstChild("AnimalOverhead", true)
-            if overhead and overhead:IsA("BillboardGui") then
-                local incomeText
-                local nameText
+-------------------------------------------------
+-- 3) QUÉT TẤT CẢ ANIMALOVERHEAD TRONG PLOTS
+-------------------------------------------------
+local Plots = workspace:WaitForChild("Plots")
+local list = {}
 
-                -- quét text bên trong overhead
-                for _, inst in ipairs(overhead:GetDescendants()) do
-                    if inst:IsA("TextLabel") or inst:IsA("TextBox") then
-                        local t = inst.Text or ""
-                        if t:match("%$.*%/s") then
-                            incomeText = t          -- ví dụ: $50K/s
-                        elseif t ~= "" and not t:find("%$") and not t:find("/") then
-                            nameText = t           -- đoán là tên pet
+for _, obj in ipairs(Plots:GetDescendants()) do
+    if obj:IsA("BillboardGui") and obj.Name == "AnimalOverhead" then
+        local overhead = obj
+
+        -- Tìm model podium (cha có parent tên "AnimalPodiums")
+        local p = overhead
+        local podiumModel
+        while p and p ~= Plots do
+            if p.Parent and p.Parent.Name == "AnimalPodiums" then
+                podiumModel = p
+                break
+            end
+            p = p.Parent
+        end
+
+        local nameText, rarityText, incomeText
+
+        -- Lấy name / rarity / m/s từ TextLabel bên trong
+        for _, inst in ipairs(overhead:GetDescendants()) do
+            if inst:IsA("TextLabel") or inst:IsA("TextBox") then
+                local t = inst.Text or ""
+                if t ~= "" then
+                    if t:match("%$.*%/s") then
+                        -- dòng dạng $50K/s
+                        incomeText = t
+                    elseif not t:find("%$") and not t:find("/") then
+                        -- không có $, không có / -> name hoặc rarity
+                        if not nameText then
+                            nameText = t
+                        elseif not rarityText then
+                            rarityText = t
                         end
-                    end
-                end
-
-                if incomeText then
-                    local incomeNum = incomeToNumber(incomeText)
-
-                    -- tìm 1 BasePart để lấy Position
-                    local pos
-                    local baseModel = podium:FindFirstChild("Base")
-                    local posPart
-
-                    if baseModel and baseModel:IsA("Model") then
-                        posPart = baseModel.PrimaryPart
-                            or baseModel:FindFirstChildWhichIsA("BasePart", true)
-                    elseif baseModel and baseModel:IsA("BasePart") then
-                        posPart = baseModel
-                    end
-
-                    if not posPart then
-                        posPart = podium:FindFirstChildWhichIsA("BasePart", true)
-                    end
-
-                    if posPart then
-                        pos = posPart.Position
-                    end
-
-                    print("==========")
-                    print("Plot     :", plot.Name)
-                    print("Podium   :", podium.Name)
-                    print("Pet Name :", nameText or "(unknown)")
-                    print("Income   :", incomeText, incomeNum and "("..incomeNum..")" or "")
-                    if pos then
-                        print("Position :", pos)
                     end
                 end
             end
         end
+
+        -- bỏ những thằng không có income hoặc tên
+        if podiumModel and nameText and incomeText then
+            -- bỏ pet nằm trong required rebirth
+            if not requiredPets[nameText] then
+                table.insert(list, {
+                    podium  = podiumModel.Name,
+                    name    = nameText,
+                    rarity  = rarityText,
+                    incomeT = incomeText,
+                    incomeN = incomeToNumber(incomeText),
+                })
+            end
+        end
     end
+end
+
+-------------------------------------------------
+-- 4) SORT THEO m/s TỪ BÉ -> LỚN VÀ IN RA
+-------------------------------------------------
+table.sort(list, function(a, b)
+    return a.incomeN < b.incomeN
+end)
+
+print("==== PET KHÔNG NẰM TRONG REBIRTH REQUIRED (SORT THEO m/s) ====")
+for _, info in ipairs(list) do
+    print(
+        "Podium:", info.podium,
+        "| Name:", info.name,
+        "| Rarity:", info.rarity or "?",
+        "| m/s:", info.incomeT
+    )
 end
