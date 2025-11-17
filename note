@@ -1,228 +1,97 @@
-local Players = game:GetService("Players")
-local lp = Players.LocalPlayer
-
--------------------------------------------------
--- 1) LẤY LIST PET CẦN CHO REBIRTH (BỎ SỐ Ở CUỐI)
--------------------------------------------------
-local requiredFolder = lp.PlayerGui
-    .Rebirth
-    .Rebirth
-    .Content
-    .Holder
-    .HolderImage
-    .RequiredCharacters
-
-local function normalizeName(t)
-    t = t or ""
-    t = t:gsub("%s*%d+$", "") -- bỏ số + space cuối: "Trippy Troppy1" -> "Trippy Troppy"
-    t = t:gsub("%s+$", "")
-    return t
-end
-
-local requiredPets = {}
-
-for _, inst in ipairs(requiredFolder:GetDescendants()) do
-    if inst:IsA("TextLabel") or inst:IsA("TextBox") then
-        local txt = inst.Text or ""
-        if txt ~= "" and not txt:find("%$") then
-            local base = normalizeName(txt)
-            if base ~= "" then
-                requiredPets[base] = true
-            end
-        end
-    end
-end
-
--------------------------------------------------
--- 2) ĐỔI "$50K/s" -> 50000 ĐỂ SORT
--------------------------------------------------
-local suffixMul = {
-    K = 1e3,
-    M = 1e6,
-    B = 1e9,
-    T = 1e12,
-}
-
-local function incomeToNumber(text)
-    if not text then return 0 end
-    local t = text:gsub("%$", ""):gsub("/s", ""):gsub(",", ""):gsub("%s+", "")
-    local suffix = t:match("([KMBT])$")
-
-    if suffix then
-        local base = tonumber(t:sub(1, #t - 1))
-        if not base then return 0 end
-        return base * (suffixMul[suffix] or 1)
-    else
-        return tonumber(t) or 0
-    end
-end
-
--------------------------------------------------
--- 3) HÀM TÁCH NAME / RARITY TỪ ANIMALOVERHEAD
--------------------------------------------------
-
--- keyword nhận dạng rarity
-local rarityKeywords = {
-    "secret",
-    "god",
-    "legend",
-    "epic",
-    "rare",
-    "common",
-    "uncommon",
-    "brainrot", -- trong game hay có Brainrot God
-}
-
--- loại bỏ mấy chữ dạng “Gold, Radioactive, …”
-local variantKeywords = {
-    "gold", "radioactive", "diamond", "rainbow"
-}
-
-local function classifyTexts(plainTexts)
-    local petName
-    local rarity
-
-    -- tìm rarity: text nào chứa từ khóa trong rarityKeywords
-    for _, t in ipairs(plainTexts) do
-        local l = t:lower()
-        for _, kw in ipairs(rarityKeywords) do
-            if l:find(kw) then
-                rarity = t
-                break
-            end
-        end
-        if rarity then break end
-    end
-
-    -- tìm tên pet: text không phải rarity, không phải variant
-    for _, t in ipairs(plainTexts) do
-        if t ~= rarity then
-            local l = t:lower()
-            local isVariant = false
-            for _, kw in ipairs(variantKeywords) do
-                if l == kw then
-                    isVariant = true
-                    break
-                end
-            end
-            if not isVariant then
-                petName = t
-                break
-            end
-        end
-    end
-
-    if not petName and #plainTexts > 0 then
-        petName = plainTexts[1]
-    end
-
-    return petName, rarity
-end
-
--------------------------------------------------
--- 4) MAP THỨ TỰ RARITY: sec > god > legend > epic > rare > common > uncommon
--------------------------------------------------
-
-local rarityPriorityList = {
-    "secret",
-    "god",
-    "legend",
-    "epic",
-    "rare",
-    "common",
-    "uncommon",
-}
-
-local rarityPriority = {}
-for i, name in ipairs(rarityPriorityList) do
-    rarityPriority[name] = i
-end
-
-local function getRarityRank(rarityText)
-    if not rarityText then return #rarityPriorityList + 1 end
-    local l = rarityText:lower()
-    for key, rank in pairs(rarityPriority) do
-        if l:find(key) then
-            return rank
-        end
-    end
-    return #rarityPriorityList + 1
-end
-
--------------------------------------------------
--- 5) QUÉT TẤT CẢ ANIMALOVERHEAD TRONG PLOTS
--------------------------------------------------
 local Plots = workspace:WaitForChild("Plots")
-local list = {}
 
-for _, obj in ipairs(Plots:GetDescendants()) do
-    if obj:IsA("BillboardGui") and obj.Name == "AnimalOverhead" then
-        local overhead = obj
+-- === ĐỔI ID PLOT CỦA BẠN Ở ĐÂY ===
+local PLOT_ID = "168814b7-8d18-4f99-b9ad-74da06f16cfb"
+local plot = Plots:FindFirstChild(PLOT_ID)
 
-        -- tìm podium model (cha có parent tên "AnimalPodiums")
-        local p = overhead
-        local podiumModel
-        while p and p ~= Plots do
-            if p.Parent and p.Parent.Name == "AnimalPodiums" then
-                podiumModel = p
-                break
+if not plot then
+    warn("Không tìm thấy plot:", PLOT_ID)
+    return
+end
+
+----------------------------------------------------------------
+-- 1) Lấy list PET: model + FakeRootPart + slot Cube.xxx
+----------------------------------------------------------------
+local function getSlotName(petModel)
+    local bestName, bestNum
+
+    for _, ch in ipairs(petModel:GetChildren()) do
+        local n = ch.Name
+        local lower = n:lower()
+        if lower:sub(1,4) == "cube" then
+            -- bắt số sau "Cube" hoặc "Cube."
+            local num = tonumber(n:match("Cube%.?(%d+)") or "0") or 0
+            if not bestNum or num < bestNum then
+                bestNum = num
+                bestName = n
             end
-            p = p.Parent
         end
-        if not podiumModel then
-            continue
+    end
+
+    return bestName or "Cube?"
+end
+
+local pets = {}
+
+for _, m in ipairs(plot:GetChildren()) do
+    if m:IsA("Model") and m.Name ~= "Base" and not m:FindFirstChild("AnimalPodiums") then
+        local root = m:FindFirstChild("FakeRootPart", true)
+        if root and root:IsA("BasePart") then
+            table.insert(pets, {
+                model = m,
+                root  = root,
+                slot  = getSlotName(m),
+            })
         end
+    end
+end
 
-        local incomeText
-        local plainTexts = {}
+----------------------------------------------------------------
+-- 2) Lấy list “chỗ đứng” = Base.Decorations.Decoration.Part
+----------------------------------------------------------------
+local spots = {}
 
-        for _, inst in ipairs(overhead:GetDescendants()) do
-            if inst:IsA("TextLabel") or inst:IsA("TextBox") then
-                local t = inst.Text or ""
-                if t ~= "" then
-                    if t:match("%$.*%/s") then
-                        incomeText = t         -- $xx/s
-                    elseif not t:find("%$") and not t:find("/") then
-                        table.insert(plainTexts, t)
+for _, podium in ipairs(plot:GetChildren()) do
+    if podium:IsA("Model") then
+        local base = podium:FindFirstChild("Base")
+        if base then
+            local decos = base:FindFirstChild("Decorations")
+            if decos then
+                for _, dec in ipairs(decos:GetDescendants()) do
+                    if dec:IsA("BasePart") and dec.Name == "Part" then
+                        table.insert(spots, {
+                            podium = podium,
+                            part   = dec,
+                        })
                     end
                 end
             end
         end
-
-        if incomeText and #plainTexts > 0 then
-            local petName, rarity = classifyTexts(plainTexts)
-
-            local baseName = normalizeName(petName or "")
-            if baseName ~= "" and not requiredPets[baseName] then
-                table.insert(list, {
-                    podium   = podiumModel.Name,
-                    name     = petName or "(?)",
-                    rarity   = rarity or "(?)",
-                    rarityRk = getRarityRank(rarity),
-                    incomeT  = incomeText,
-                    incomeN  = incomeToNumber(incomeText),
-                })
-            end
-        end
     end
 end
 
--------------------------------------------------
--- 6) SORT: theo rarity rank -> m/s tăng dần
--------------------------------------------------
-table.sort(list, function(a, b)
-    if a.rarityRk ~= b.rarityRk then
-        return a.rarityRk < b.rarityRk
-    end
-    return a.incomeN < b.incomeN
-end)
+----------------------------------------------------------------
+-- 3) Với mỗi spot, tìm pet gần nhất và in ra: tên + slot
+----------------------------------------------------------------
+for _, spot in ipairs(spots) do
+    local pos = spot.part.Position
+    local bestPet, bestDist
 
-print("==== PET KHÔNG NẰM TRONG REBIRTH REQUIRED (SORT THEO RARITY & m/s) ====")
-for _, info in ipairs(list) do
-    print(
-        "Podium:", info.podium,
-        "| Name:", info.name,
-        "| Rarity:", info.rarity,
-        "| m/s:", info.incomeT
-    )
+    for _, pet in ipairs(pets) do
+        local d = (pet.root.Position - pos).Magnitude
+        if not bestDist or d < bestDist then
+            bestDist = d
+            bestPet  = pet
+        end
+    end
+
+    if bestPet then
+        print(
+            "Podium:", spot.podium.Name,
+            "| Spot:", spot.part:GetFullName(),
+            "| Pet:",  bestPet.model.Name,
+            "| Slot:", bestPet.slot,
+            "| Dist:", math.floor(bestDist)
+        )
+    end
 end
