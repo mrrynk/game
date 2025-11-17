@@ -1,80 +1,67 @@
 local Plots = workspace:WaitForChild("Plots")
 
--- === ĐỔI ID PLOT CỦA BẠN Ở ĐÂY ===
+-- ĐỔI ID PLOT CỦA BẠN Ở ĐÂY
 local PLOT_ID = "168814b7-8d18-4f99-b9ad-74da06f16cfb"
 local plot = Plots:FindFirstChild(PLOT_ID)
-
 if not plot then
     warn("Không tìm thấy plot:", PLOT_ID)
     return
 end
 
-----------------------------------------------------------------
--- 1) Lấy list PET: model + FakeRootPart + slot Cube.xxx
-----------------------------------------------------------------
-local function getSlotName(petModel)
-    local bestName, bestNum
-
-    for _, ch in ipairs(petModel:GetChildren()) do
-        local n = ch.Name
-        local lower = n:lower()
-        if lower:sub(1,4) == "cube" then
-            -- bắt số sau "Cube" hoặc "Cube."
-            local num = tonumber(n:match("Cube%.?(%d+)") or "0") or 0
-            if not bestNum or num < bestNum then
-                bestNum = num
-                bestName = n
-            end
-        end
-    end
-
-    return bestName or "Cube?"
-end
-
+-------------------------------------------------
+-- 1) Lấy list pet: Model + FakeRootPart
+-------------------------------------------------
 local pets = {}
 
 for _, m in ipairs(plot:GetChildren()) do
-    if m:IsA("Model") and m.Name ~= "Base" and not m:FindFirstChild("AnimalPodiums") then
+    if m:IsA("Model") and m.Name ~= "Base" and m.Name ~= "AnimalPodiums" then
         local root = m:FindFirstChild("FakeRootPart", true)
         if root and root:IsA("BasePart") then
             table.insert(pets, {
                 model = m,
                 root  = root,
-                slot  = getSlotName(m),
             })
         end
     end
 end
 
-----------------------------------------------------------------
--- 2) Lấy list “chỗ đứng” = Base.Decorations.Decoration.Part
-----------------------------------------------------------------
-local spots = {}
+-------------------------------------------------
+-- 2) Lấy list slot: mỗi AnimalPodiums.N.Base.Decorations.Decoration.Part
+-------------------------------------------------
+local slots = {}
 
-for _, podium in ipairs(plot:GetChildren()) do
-    if podium:IsA("Model") then
-        local base = podium:FindFirstChild("Base")
-        if base then
-            local decos = base:FindFirstChild("Decorations")
-            if decos then
-                for _, dec in ipairs(decos:GetDescendants()) do
-                    if dec:IsA("BasePart") and dec.Name == "Part" then
-                        table.insert(spots, {
-                            podium = podium,
-                            part   = dec,
-                        })
-                    end
+local podiumsFolder = plot:FindFirstChild("AnimalPodiums")
+if not podiumsFolder then
+    warn("Plot không có AnimalPodiums")
+    return
+end
+
+for _, podium in ipairs(podiumsFolder:GetChildren()) do
+    local base = podium:FindFirstChild("Base")
+    if base then
+        local decos = base:FindFirstChild("Decorations")
+        if decos then
+            local deco = decos:FindFirstChild("Decoration")
+            if deco then
+                local part = deco:FindFirstChild("Part")
+                if part and part:IsA("BasePart") then
+                    table.insert(slots, {
+                        index = podium.Name, -- số thứ tự slot
+                        part  = part,
+                    })
                 end
             end
         end
     end
 end
 
-----------------------------------------------------------------
--- 3) Với mỗi spot, tìm pet gần nhất và in ra: tên + slot
-----------------------------------------------------------------
-for _, spot in ipairs(spots) do
-    local pos = spot.part.Position
+-------------------------------------------------
+-- 3) Với mỗi slot, tìm pet gần nhất
+-------------------------------------------------
+print("== MAP SLOT -> PET ==")
+
+for _, slot in ipairs(slots) do
+    local pos = slot.part.Position
     local bestPet, bestDist
 
     for _, pet in ipairs(pets) do
@@ -87,10 +74,8 @@ for _, spot in ipairs(spots) do
 
     if bestPet then
         print(
-            "Podium:", spot.podium.Name,
-            "| Spot:", spot.part:GetFullName(),
-            "| Pet:",  bestPet.model.Name,
-            "| Slot:", bestPet.slot,
+            "Slot:", slot.index,
+            "| Pet:", bestPet.model.Name,
             "| Dist:", math.floor(bestDist)
         )
     end
