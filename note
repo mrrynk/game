@@ -4,9 +4,11 @@ local DRY_RUN  = true       -- true = chỉ in log, false = bán thật
 
 -- Danh sách pet CẦN GIỮ (dạng list, sửa tên ở đây)
 local KEEP_LIST = {
-    "Tentacolo Tecnico",
-    "Cupcake Koala",
-    "Pet 3",
+    "Tralaledon",
+    "Los Primos",
+    "Eviledon",
+    "Orcaledon",
+    "Capitano Moby",
 }
 
 -- model/folder trong plot KHÔNG phải pet
