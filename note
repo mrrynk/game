@@ -1,118 +1,104 @@
 local Plots = workspace:WaitForChild("Plots")
 local MAX_DIST = 3
 
--- Tìm plot root (con trực tiếp của Plots)
-local function getPlotRoot(inst)
-    local p = inst
-    while p and p ~= Plots do
-        if p.Parent == Plots and p:IsA("Model") then
-            return p
-        end
-        p = p.Parent
-    end
-    return nil
-end
-
 -------------------------------------------------
--- 1) Gom PET theo plot (model có FakeRootPart)
+-- 1) Gom toàn bộ PET (model có FakeRootPart, không thuộc AnimalPodiums)
 -------------------------------------------------
-local petsByPlot = {}
+local pets = {}
 
 for _, m in ipairs(Plots:GetDescendants()) do
-    if m:IsA("Model") and m:FindFirstChild("FakeRootPart", true) then
-        -- bỏ mấy model nằm trong AnimalPodiums
-        local p, inPodiums = m, false
-        while p and p ~= Plots do
-            if p.Name == "AnimalPodiums" then
-                inPodiums = true
-                break
-            end
-            p = p.Parent
-        end
-        if not inPodiums then
-            local root = m:FindFirstChild("FakeRootPart", true)
-            if root and root:IsA("BasePart") then
-                local plot = getPlotRoot(m)
-                if plot then
-                    petsByPlot[plot] = petsByPlot[plot] or {}
-                    table.insert(petsByPlot[plot], {model = m, root = root})
+    if m:IsA("Model") then
+        local root = m:FindFirstChild("FakeRootPart", true)
+        if root and root:IsA("BasePart") then
+            -- bỏ những model nằm trong cây AnimalPodiums
+            local p, inPodiums = m, false
+            while p and p ~= Plots do
+                if p.Name == "AnimalPodiums" then
+                    inPodiums = true
+                    break
                 end
+                p = p.Parent
+            end
+            if not inPodiums then
+                table.insert(pets, {model = m, root = root})
             end
         end
     end
 end
 
+print("Pets found:", #pets)
+
 -------------------------------------------------
--- 2) Gom SLOT: dùng Decorations (lấy part con gần nhất)
+-- 2) Gom SLOT theo mỗi Base của AnimalPodiums
+--    + lấy tên pet từ AnimalOverhead.DisplayName
 -------------------------------------------------
 local slots = {}
 
-for plot, _ in pairs(petsByPlot) do  -- chỉ plot có pet
-    local podiumsFolder = plot:FindFirstChild("AnimalPodiums")
-    if podiumsFolder then
-        for _, podium in ipairs(podiumsFolder:GetChildren()) do
-            local base = podium:FindFirstChild("Base")
-            if base then
-                local decos = base:FindFirstChild("Decorations")
-                if decos then
-                    -- tìm 1 BasePart bất kỳ bên trong Decorations
-                    local spotPart
-                    for _, d in ipairs(decos:GetDescendants()) do
-                        if d:IsA("BasePart") then
-                            spotPart = d
-                            break
-                        end
-                    end
+for _, base in ipairs(Plots:GetDescendants()) do
+    if base:IsA("Model") and base.Name == "Base" then
+        local podium = base.Parent                -- AnimalPodiums.<N>
+        if podium and podium.Parent and podium.Parent.Name == "AnimalPodiums" then
+            local slotIndex = podium.Name
 
-                    -- tên pet từ GUI
-                    local overhead = podium:FindFirstChild("AnimalOverhead", true)
-                    local petName
-                    if overhead then
-                        local disp = overhead:FindFirstChild("DisplayName", true)
-                        if disp and disp:IsA("TextLabel") then
-                            petName = disp.Text
-                        end
-                    end
-
-                    if spotPart and petName and petName ~= "" then
-                        table.insert(slots, {
-                            plot    = plot,
-                            index   = podium.Name,
-                            part    = spotPart,
-                            petName = petName,
-                        })
+            -- lấy 1 BasePart trong Base để làm vị trí tham chiếu
+            local spotPart
+            -- ưu tiên Spawn nếu có
+            local spawn = base:FindFirstChild("Spawn", true)
+            if spawn and spawn:IsA("BasePart") then
+                spotPart = spawn
+            else
+                for _, d in ipairs(base:GetDescendants()) do
+                    if d:IsA("BasePart") then
+                        spotPart = d
+                        break
                     end
                 end
+            end
+
+            -- GUI tên pet
+            local overhead = podium:FindFirstChild("AnimalOverhead", true)
+            local petName
+            if overhead then
+                local disp = overhead:FindFirstChild("DisplayName", true)
+                if disp and disp:IsA("TextLabel") then
+                    petName = disp.Text
+                end
+            end
+
+            if spotPart and petName and petName ~= "" then
+                table.insert(slots, {
+                    index   = slotIndex,
+                    part    = spotPart,
+                    petName = petName,
+                })
             end
         end
     end
 end
 
+print("Slots (Base) found:", #slots)
+
 -------------------------------------------------
--- 3) Slot -> pet gần nhất (trong cùng plot, dist <= 3)
+-- 3) Với mỗi Base: tìm pet gần nhất (FakeRootPart), nếu dist <= 3 thì in
 -------------------------------------------------
-print("== SLOT | PET | DIST (dùng Decorations, dist <= 3) ==")
+print("== SLOT | PET | DIST (tính theo Base, dist <= 3) ==")
 
 for _, slot in ipairs(slots) do
-    local pets = petsByPlot[slot.plot]
-    if pets and #pets > 0 then
-        local pos = slot.part.Position
-        local bestPet, bestDist
+    local pos = slot.part.Position
+    local bestDist
 
-        for _, pet in ipairs(pets) do
-            local d = (pet.root.Position - pos).Magnitude
-            if not bestDist or d < bestDist then
-                bestDist = d
-                bestPet  = pet
-            end
+    for _, pet in ipairs(pets) do
+        local d = (pet.root.Position - pos).Magnitude
+        if not bestDist or d < bestDist then
+            bestDist = d
         end
+    end
 
-        if bestPet and bestDist <= MAX_DIST then
-            print(
-                "Slot:", slot.index,
-                "| Pet:", slot.petName,
-                "| Dist:", string.format("%.2f", bestDist)
-            )
-        end
+    if bestDist and bestDist <= MAX_DIST then
+        print(
+            "Slot:", slot.index,
+            "| Pet:", slot.petName,
+            "| Dist:", string.format("%.2f", bestDist)
+        )
     end
 end
