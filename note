@@ -1,23 +1,31 @@
-local Plots = workspace:WaitForChild("Plots")
+local Plots    = workspace:WaitForChild("Plots")
+local MAX_DIST = 3      -- khoảng cách 2D tối đa để coi là đứng đúng slot
 
--- các folder trong plot KHÔNG phải pet
+-- các folder/model trong plot KHÔNG phải pet
 local ignoreNames = {
-    AnimalPodiums = true,
-    Decorations   = true,
+    AnimalPodiums  = true,
+    Decorations    = true,
     InvisibleWalls = true,
-    Laser         = true,
-    LaserHitbox   = true,
-    Purchases     = true,
-    Skin          = true,
-    Unlock        = true,
+    Laser          = true,
+    LaserHitbox    = true,
+    Purchases      = true,
+    Skin           = true,
+    Unlock         = true,
+
+    -- 2 thằng rác
+    FriendPanel    = true,
+    Model          = true,
 }
 
+-- ưu tiên RootPart -> FakeRootPart -> BasePart bất kỳ
 local function findRootPart(model)
-    -- ưu tiên FakeRootPart, không có thì lấy BasePart bất kỳ
-    local root = model:FindFirstChild("FakeRootPart", true)
+    local root = model:FindFirstChild("RootPart", true)
+              or model:FindFirstChild("FakeRootPart", true)
+
     if root and root:IsA("BasePart") then
         return root
     end
+
     for _, d in ipairs(model:GetDescendants()) do
         if d:IsA("BasePart") then
             return d
@@ -26,60 +34,101 @@ local function findRootPart(model)
     return nil
 end
 
-print("=== DEBUG PET & BASE THEO PLOT ===")
+-- distance 2D (bỏ qua Y)
+local function flatDist(a, b)
+    local dx = a.X - b.X
+    local dz = a.Z - b.Z
+    return math.sqrt(dx*dx + dz*dz)
+end
 
-local totalPets, totalBases = 0, 0
+-------------------------------------------------
+-- 1) Gom PET theo từng plot
+-------------------------------------------------
+local petsByPlot = {}
 
 for _, plot in ipairs(Plots:GetChildren()) do
     if not plot:IsA("Model") then continue end
-
-    ------------------------------------
-    -- 1) PET trong plot này
-    ------------------------------------
-    local pets = {}
 
     for _, child in ipairs(plot:GetChildren()) do
         if child:IsA("Model") and not ignoreNames[child.Name] then
             local root = findRootPart(child)
             if root then
-                table.insert(pets, {model = child, root = root})
+                petsByPlot[plot] = petsByPlot[plot] or {}
+                table.insert(petsByPlot[plot], {
+                    model = child,
+                    root  = root,
+                })
             end
         end
     end
+end
 
-    ------------------------------------
-    -- 2) BASE (slot) trong plot này
-    ------------------------------------
-    local baseSlots = {}
+-------------------------------------------------
+-- 2) Gom SLOT: mỗi Base trong AnimalPodiums của từng plot
+-------------------------------------------------
+local slots = {}
+
+for plot, pets in pairs(petsByPlot) do
+    if #pets == 0 then
+        continue
+    end
+
     local podiumsFolder = plot:FindFirstChild("AnimalPodiums")
-
     if podiumsFolder then
         for _, podium in ipairs(podiumsFolder:GetChildren()) do
             local base = podium:FindFirstChild("Base")
             if base and base:IsA("Model") then
-                table.insert(baseSlots, podium.Name) -- số slot
+                -- lấy 1 BasePart trong Base (ưu tiên Spawn)
+                local spot
+                local spawn = base:FindFirstChild("Spawn", true)
+                if spawn and spawn:IsA("BasePart") then
+                    spot = spawn
+                else
+                    for _, d in ipairs(base:GetDescendants()) do
+                        if d:IsA("BasePart") then
+                            spot = d
+                            break
+                        end
+                    end
+                end
+
+                if spot then
+                    table.insert(slots, {
+                        plot  = plot,
+                        index = podium.Name, -- số slot
+                        part  = spot,
+                    })
+                end
             end
         end
     end
-
-    ------------------------------------
-    -- IN DEBUG CHO PLOT NÀY
-    ------------------------------------
-    print("\n----- PLOT:", plot.Name, "-----")
-    print("Pets found:", #pets)
-    for _, p in ipairs(pets) do
-        print("  Pet:", p.model.Name, "| Root:", p.root:GetFullName())
-    end
-
-    print("Base slots found:", #baseSlots)
-    for _, idx in ipairs(baseSlots) do
-        print("  Slot Base:", idx)
-    end
-
-    totalPets  = totalPets  + #pets
-    totalBases = totalBases + #baseSlots
 end
 
-print("\n=== TỔNG KẾT TOÀN SERVER ===")
-print("Total pets:", totalPets)
-print("Total Base slots:", totalBases)
+-------------------------------------------------
+-- 3) Map SLOT -> pet gần nhất (trong cùng plot, dist2D <= MAX_DIST)
+-------------------------------------------------
+print("== SLOT | PET (RootPart) | Dist2D (<= "..MAX_DIST..") ==")
+
+for _, slot in ipairs(slots) do
+    local pets = petsByPlot[slot.plot]
+    if pets and #pets > 0 then
+        local pos = slot.part.Position
+        local bestPet, bestDist
+
+        for _, pet in ipairs(pets) do
+            local d = flatDist(pet.root.Position, pos)
+            if not bestDist or d < bestDist then
+                bestDist = d
+                bestPet  = pet
+            end
+        end
+
+        if bestPet and bestDist <= MAX_DIST then
+            print(
+                "Slot:", slot.index,
+                "| Pet:", bestPet.model.Name,
+                "| Dist:", string.format("%.3f", bestDist)
+            )
+        end
+    end
+end
