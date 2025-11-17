@@ -1,8 +1,22 @@
---== CONFIG ==========================================
-local MAX_DIST = 3          -- khoảng cách 2D tối đa coi là đứng trên slot (2D: X,Z)
-local DRY_RUN  = false      -- true = chỉ in log, false = bán thật
+-------------------------------------------------
+--== CONFIG (CHỈ SỬA Ở ĐÂY) ======================
+-------------------------------------------------
 
--- Danh sách pet CẦN GIỮ (dạng list, sửa tên ở đây)
+-- AUTO CÂU CÁ
+local FISH_SLOT_INDEX          = 0      -- args[1] cho Cast
+local FISH_MINIGAME_DURATION   = 3      -- số giây spam click
+local FISH_CAST_DELAY          = 0      -- delay sau khi cast (0 = spam luôn)
+
+-- AUTO EQUIP CẦN CÂU
+local EQUIP_KEYCODE            = Enum.KeyCode.Two  -- phím để equip (slot 2)
+local EQUIP_CHECK_INTERVAL     = 10     -- mỗi 10s check 1 lần
+
+-- AUTO LỌC / BÁN PET
+local MAX_DIST                 = 3      -- khoảng cách 2D tối đa coi là đứng trên slot
+local DRY_RUN                  = false -- true = chỉ in log, false = bán thật
+local TOP_KEEP_BY_INCOME       = 5      -- giữ lại top X pet m/s cao nhất
+
+-- Danh sách pet CẦN GIỮ (theo tên Model)
 local KEEP_LIST = {
     "Tralaledon",
     "Los Primos",
@@ -39,23 +53,89 @@ local ignoreNames = {
     FriendPanel    = true,
     Model          = true,
 }
---====================================================
 
-local Players          = game:GetService("Players")
-local LocalPlayer      = Players.LocalPlayer
+-------------------------------------------------
+-- DƯỚI ĐÂY LÀ CODE CHẠY, KHÔNG CẦN ĐỤNG TỚI
+-------------------------------------------------
+
+local Players           = game:GetService("Players")
+local LocalPlayer       = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Plots           = workspace:WaitForChild("Plots")
-local Net             = ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Net")
-local SellRemote      = Net:FindFirstChild("RE/PlotService/Sell")
+local Net               = ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Net")
+local Plots             = workspace:WaitForChild("Plots")
+local vim               = game:GetService("VirtualInputManager")
+
+-------------------------------------------------
+-- 1) AUTO CÂU CÁ
+-------------------------------------------------
+local castRemote  = Net:FindFirstChild("RE/FishingRod.Cast")
+local clickRemote = Net:FindFirstChild("RE/FishingRod.MinigameClick")
+
+local fishArgs = {
+    [1] = FISH_SLOT_INDEX
+}
+
+task.spawn(function()
+    if not castRemote or not clickRemote then
+        warn("Không tìm thấy remote câu cá")
+        return
+    end
+
+    while true do
+        -- Thả cần
+        castRemote:FireServer(unpack(fishArgs))
+
+        -- Đợi minigame hiện
+        task.wait(FISH_CAST_DELAY)
+
+        -- Spam click trong FISH_MINIGAME_DURATION giây
+        local startTime = tick()
+        while tick() - startTime < FISH_MINIGAME_DURATION do
+            clickRemote:FireServer()
+            task.wait(0)
+        end
+    end
+end)
+
+-------------------------------------------------
+-- 2) AUTO EQUIP CẦN CÂU (NẾU MẤT FISHING ROD THÌ BẤM PHÍM EQUIP_KEYCODE)
+-------------------------------------------------
+local function hasFishingRod()
+    local playerModel = workspace:FindFirstChild(LocalPlayer.Name)
+    if not playerModel then
+        return false
+    end
+    local rod = playerModel:FindFirstChild("Fishing Rod", true)
+    return rod ~= nil, rod
+end
+
+task.spawn(function()
+    while true do
+        local ok, rod = hasFishingRod()
+        print("Đang có Fishing Rod trong workspace.<playerName> ?", ok, rod and rod:GetFullName() or "")
+
+        if not ok then
+            -- KHÔNG có cần câu -> giả bấm phím EQUIP_KEYCODE để equip slot tương ứng
+            vim:SendKeyEvent(true,  EQUIP_KEYCODE, false, game)
+            vim:SendKeyEvent(false, EQUIP_KEYCODE, false, game)
+            print(">>> Không có Fishing Rod, gửi input phím", tostring(EQUIP_KEYCODE), "để equip")
+        end
+
+        task.wait(EQUIP_CHECK_INTERVAL)
+    end
+end)
+
+-------------------------------------------------
+-- 3) AUTO LỌC / BÁN PET
+-------------------------------------------------
+local SellRemote = Net:FindFirstChild("RE/PlotService/Sell")
 
 if not SellRemote then
     warn("Không tìm thấy remote RE/PlotService/Sell")
     return
 end
 
--------------------------------------------------
 -- KEEP theo tên
--------------------------------------------------
 local function shouldKeepByName(name)
     for _, n in ipairs(KEEP_LIST) do
         if n == name then return true end
@@ -63,9 +143,7 @@ local function shouldKeepByName(name)
     return false
 end
 
--------------------------------------------------
 -- REBIRTH REQUIRED: build set tên pet cần giữ
--------------------------------------------------
 local requiredPets = {}
 
 local function normalizeName(t)
@@ -104,9 +182,7 @@ local function isRebirthRequired(name)
     return requiredPets[base] == true
 end
 
--------------------------------------------------
--- Đổi "$50K/s" -> 50000 để so top 5 m/s
--------------------------------------------------
+-- Đổi "$50K/s" -> 50000 để so top m/s
 local suffixMul = {
     K = 1e3,
     M = 1e6,
@@ -128,9 +204,7 @@ local function incomeToNumber(text)
     end
 end
 
--------------------------------------------------
 -- RootPart finder + khoảng cách 2D
--------------------------------------------------
 local function findRootPart(model)
     local root = model:FindFirstChild("RootPart", true)
               or model:FindFirstChild("FakeRootPart", true)
@@ -147,11 +221,8 @@ local function flatDist(a, b)
     return math.sqrt(dx*dx + dz*dz)
 end
 
--------------------------------------------------
 -- HÀM CHẠY 1 LẦN LỌC + BÁN, trả về số pet đã bán
--------------------------------------------------
 local function RunFilterOnce()
-    -- update danh sách pet rebirth required
     refreshRequiredPets()
 
     local petsByPlot = {}
@@ -195,7 +266,6 @@ local function RunFilterOnce()
                     end
 
                     if spot then
-                        -- tìm pet gần nhất cho slot này
                         local pos = spot.Position
                         local bestPet, bestDist
 
@@ -215,7 +285,7 @@ local function RunFilterOnce()
                                 part    = spot,
                                 pet     = bestPet,
                                 dist    = bestDist,
-                                incomeN = 0,   -- sẽ fill sau
+                                incomeN = 0,
                             })
                         end
                     end
@@ -224,7 +294,7 @@ local function RunFilterOnce()
         end
     end
 
-    -- 3) Đọc m/s cho từng slot từ AnimalOverhead để tìm top 5
+    -- 3) Đọc m/s cho từng slot từ AnimalOverhead để tìm top X
     for _, info in ipairs(slotInfos) do
         local overhead = info.podium:FindFirstChild("AnimalOverhead", true)
         if overhead then
@@ -244,13 +314,12 @@ local function RunFilterOnce()
         end
     end
 
-    -- sort theo income giảm dần để lấy top 5
     table.sort(slotInfos, function(a, b)
         return (a.incomeN or 0) > (b.incomeN or 0)
     end)
 
     local topIncomeSlots = {}
-    local TOP_COUNT = math.min(5, #slotInfos)
+    local TOP_COUNT = math.min(TOP_KEEP_BY_INCOME, #slotInfos)
     for i = 1, TOP_COUNT do
         local s = slotInfos[i]
         topIncomeSlots[s.index] = true
@@ -268,10 +337,7 @@ local function RunFilterOnce()
         local keepByIncome  = topIncomeSlots[info.index] == true
 
         if keepByName or keepByRebirth or keepByIncome then
-            -- debug nếu muốn:
-            -- print(string.format("KEEP slot %s | Pet: %s | Dist: %.3f | incomeN: %.0f (name=%s rebirth=%s top5=%s)",
-            --      info.index, petName, info.dist, info.incomeN,
-            --      tostring(keepByName), tostring(keepByRebirth), tostring(keepByIncome)))
+            -- KEEP
         else
             totalSell += 1
             print(string.format(
@@ -288,15 +354,15 @@ local function RunFilterOnce()
     return totalSell
 end
 
--------------------------------------------------
 -- VÒNG LẶP QUÉT LIÊN TỤC
--------------------------------------------------
-while true do
-    local sold = RunFilterOnce()
+task.spawn(function()
+    while true do
+        local sold = RunFilterOnce()
 
-    if sold > 0 then
-        task.wait(0.5)  -- đang bán nhiều, quét nhanh
-    else
-        task.wait(1)    -- hết pet để bán, nghỉ tí rồi check lại
+        if sold > 0 then
+            task.wait(0.5)
+        else
+            task.wait(1)
+        end
     end
-end
+end)
