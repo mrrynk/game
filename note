@@ -1,17 +1,14 @@
 --== CONFIG ==========================================
 local MAX_DIST = 3          -- khoảng cách 2D tối đa coi là đứng trên slot
-local DRY_RUN  = false       -- true = chỉ in log, false = bán thật
+local DRY_RUN  = true       -- true = chỉ in log, false = bán thật
 
 -- Danh sách pet CẦN GIỮ (dạng list, sửa tên ở đây)
 local KEEP_LIST = {
-    "Tralaledon",
-    "Los Primos",
-    "Eviledon",
-    "Orcaledon",
-    "Capitano Moby",
+    "Tentacolo Tecnico",
+    "Cupcake Koala",
+    "Pet 3",
 }
 
--- model/folder trong plot KHÔNG phải pet
 local ignoreNames = {
     AnimalPodiums  = true,
     Decorations    = true,
@@ -21,7 +18,6 @@ local ignoreNames = {
     Purchases      = true,
     Skin           = true,
     Unlock         = true,
-
     FriendPanel    = true,
     Model          = true,
 }
@@ -39,9 +35,7 @@ end
 
 local function shouldKeep(name)
     for _, n in ipairs(KEEP_LIST) do
-        if n == name then
-            return true
-        end
+        if n == name then return true end
     end
     return false
 end
@@ -49,14 +43,9 @@ end
 local function findRootPart(model)
     local root = model:FindFirstChild("RootPart", true)
               or model:FindFirstChild("FakeRootPart", true)
-
-    if root and root:IsA("BasePart") then
-        return root
-    end
+    if root and root:IsA("BasePart") then return root end
     for _, d in ipairs(model:GetDescendants()) do
-        if d:IsA("BasePart") then
-            return d
-        end
+        if d:IsA("BasePart") then return d end
     end
     return nil
 end
@@ -67,18 +56,15 @@ local function flatDist(a, b)
     return math.sqrt(dx*dx + dz*dz)
 end
 
---====================================================
--- HÀM CHẠY 1 LẦN LỌC + BÁN
---====================================================
+-------------------------------------------------
+-- HÀM CHẠY 1 LẦN LỌC + BÁN, trả về số pet đã bán
+-------------------------------------------------
 local function RunFilterOnce()
-    -------------------------------------------------
-    -- 1) Gom PET theo plot
-    -------------------------------------------------
     local petsByPlot = {}
 
+    -- 1) Gom PET
     for _, plot in ipairs(Plots:GetChildren()) do
         if not plot:IsA("Model") then continue end
-
         for _, child in ipairs(plot:GetChildren()) do
             if child:IsA("Model") and not ignoreNames[child.Name] then
                 local root = findRootPart(child)
@@ -90,14 +76,10 @@ local function RunFilterOnce()
         end
     end
 
-    -------------------------------------------------
-    -- 2) Gom SLOT: Base trong AnimalPodiums
-    -------------------------------------------------
+    -- 2) Gom SLOT
     local slots = {}
-
     for plot, pets in pairs(petsByPlot) do
         if #pets == 0 then continue end
-
         local podiumsFolder = plot:FindFirstChild("AnimalPodiums")
         if podiumsFolder then
             for _, podium in ipairs(podiumsFolder:GetChildren()) do
@@ -115,7 +97,6 @@ local function RunFilterOnce()
                             end
                         end
                     end
-
                     if spot then
                         table.insert(slots, {
                             plot  = plot,
@@ -128,12 +109,8 @@ local function RunFilterOnce()
         end
     end
 
-    -------------------------------------------------
-    -- 3) Map slot -> pet gần nhất & SELL
-    -------------------------------------------------
-    local totalKeep, totalSell = 0, 0
-
-    print("== LỌC PET (DRY_RUN = " .. tostring(DRY_RUN) .. ") ==")
+    -- 3) Map slot -> pet & SELL
+    local totalSell = 0
 
     for _, slot in ipairs(slots) do
         local pets = petsByPlot[slot.plot]
@@ -153,33 +130,35 @@ local function RunFilterOnce()
                 local petName = bestPet.model.Name
                 local slotNum = tonumber(slot.index)
 
-                if shouldKeep(petName) then
-                    totalKeep += 1
-                    print(string.format("KEEP slot %s | Pet: %s | Dist: %.3f",
-                        slot.index, petName, bestDist))
-                else
+                if not shouldKeep(petName) then
                     totalSell += 1
                     print(string.format("SELL slot %s | Pet: %s | Dist: %.3f",
                         slot.index, petName, bestDist))
-
                     if (not DRY_RUN) and slotNum then
-                        local args = { [1] = slotNum }
-                        SellRemote:FireServer(unpack(args))
+                        SellRemote:FireServer(slotNum)
                     end
+                else
+                    -- debug nếu muốn:
+                    -- print("KEEP", slot.index, petName)
                 end
             end
         end
     end
 
-    print("== KẾT THÚC LẦN LỌC ==")
-    print("Giữ lại :", totalKeep, "pet")
-    print("Đã bán :", totalSell, "pet (DRY_RUN =", DRY_RUN, ")")
+    return totalSell
 end
 
---====================================================
--- VÒNG LẶP 10 GIÂY
---====================================================
+-------------------------------------------------
+-- VÒNG LẶP QUÉT LIÊN TỤC
+-------------------------------------------------
 while true do
-    RunFilterOnce()
-    task.wait(10)      -- đợi 10 giây rồi quét lại
+    local sold = RunFilterOnce()
+
+    -- nếu vừa bán được pet => đợi rất ngắn để tiếp tục clear
+    if sold > 0 then
+        task.wait(0.5)
+    else
+        -- không còn gì để bán thì nghỉ 5s rồi check lại
+        task.wait(5)
+    end
 end
