@@ -8,8 +8,7 @@ local pets = {}
 for _, m in ipairs(Plots:GetDescendants()) do
     if m:IsA("Model") and m:FindFirstChild("FakeRootPart", true) then
         -- bỏ mấy model nằm trong AnimalPodiums (podium, base...)
-        local p = m
-        local inPodiums = false
+        local p, inPodiums = m, false
         while p and p ~= Plots do
             if p.Name == "AnimalPodiums" then
                 inPodiums = true
@@ -20,10 +19,7 @@ for _, m in ipairs(Plots:GetDescendants()) do
         if not inPodiums then
             local root = m:FindFirstChild("FakeRootPart", true)
             if root and root:IsA("BasePart") then
-                table.insert(pets, {
-                    model = m,
-                    root  = root,
-                })
+                table.insert(pets, {model = m, root = root})
             end
         end
     end
@@ -48,18 +44,17 @@ for _, part in ipairs(Plots:GetDescendants()) do
         end
 
         if slotIndex then
-            table.insert(slots, {
-                index = slotIndex,
-                part  = part,
-            })
+            table.insert(slots, {index = slotIndex, part = part})
         end
     end
 end
 
 -------------------------------------------------
--- 3) Với mỗi slot, tìm pet gần nhất và in ra
+-- 3) Với mỗi slot, tìm pet gần nhất nhưng CHỈ NHẬN nếu Dist <= 1
 -------------------------------------------------
-print("== SLOT -> PET (toàn server) ==")
+local MAX_DIST = 1 -- chỉ nhận pet đứng cách slot ≤ 1 stud
+
+print("== SLOT -> PET (toàn server, dist <= 1) ==")
 
 for _, slot in ipairs(slots) do
     local pos = slot.part.Position
@@ -73,11 +68,7 @@ for _, slot in ipairs(slots) do
         end
     end
 
-    if bestPet then
-        print(
-            "Slot:", slot.index,
-            "| Pet:", bestPet.model.Name,
-            "| Dist:", math.floor(bestDist)
-        )
+    if bestPet and bestDist <= MAX_DIST then
+        print("Slot:", slot.index, "| Pet:", bestPet.model.Name)
     end
 end
