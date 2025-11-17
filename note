@@ -159,6 +159,6 @@ while true do
         task.wait(0.5)
     else
         -- không còn gì để bán thì nghỉ 5s rồi check lại
-        task.wait(5)
+        task.wait(1)
     end
 end
