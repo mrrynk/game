@@ -1,5 +1,5 @@
 --== CONFIG ==========================================
-local MAX_DIST = 3          -- khoảng cách 2D tối đa coi là đứng trên slot
+local MAX_DIST = 3          -- khoảng cách 2D tối đa coi là đứng trên slot (2D: X,Z)
 local DRY_RUN  = false      -- true = chỉ in log, false = bán thật
 
 -- Danh sách pet CẦN GIỮ (dạng list, sửa tên ở đây)
@@ -23,23 +23,96 @@ local ignoreNames = {
 }
 --====================================================
 
+local Players          = game:GetService("Players")
+local LocalPlayer      = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Plots            = workspace:WaitForChild("Plots")
-local Net              = ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Net")
-local SellRemote       = Net:FindFirstChild("RE/PlotService/Sell")
+local Plots           = workspace:WaitForChild("Plots")
+local Net             = ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Net")
+local SellRemote      = Net:FindFirstChild("RE/PlotService/Sell")
 
 if not SellRemote then
     warn("Không tìm thấy remote RE/PlotService/Sell")
     return
 end
 
-local function shouldKeep(name)
+-------------------------------------------------
+-- KEEP theo tên
+-------------------------------------------------
+local function shouldKeepByName(name)
     for _, n in ipairs(KEEP_LIST) do
         if n == name then return true end
     end
     return false
 end
 
+-------------------------------------------------
+-- REBIRTH REQUIRED: build set tên pet cần giữ
+-------------------------------------------------
+local requiredPets = {}
+
+local function normalizeName(t)
+    t = t or ""
+    t = t:gsub("%s*%d+$", "") -- bỏ số + space cuối: "Trippy Troppy1" -> "Trippy Troppy"
+    t = t:gsub("%s+$", "")
+    return t
+end
+
+local function refreshRequiredPets()
+    requiredPets = {}
+
+    local pg = LocalPlayer:FindFirstChild("PlayerGui")
+    if not pg then return end
+
+    local ok, folder = pcall(function()
+        return pg.Rebirth.Rebirth.Content.Holder.HolderImage.RequiredCharacters
+    end)
+    if not ok or not folder then return end
+
+    for _, inst in ipairs(folder:GetDescendants()) do
+        if inst:IsA("TextLabel") or inst:IsA("TextBox") then
+            local txt = inst.Text or ""
+            if txt ~= "" and not txt:find("%$") then
+                local base = normalizeName(txt)
+                if base ~= "" then
+                    requiredPets[base] = true
+                end
+            end
+        end
+    end
+end
+
+local function isRebirthRequired(name)
+    local base = normalizeName(name)
+    return requiredPets[base] == true
+end
+
+-------------------------------------------------
+-- Đổi "$50K/s" -> 50000 để so top 5 m/s
+-------------------------------------------------
+local suffixMul = {
+    K = 1e3,
+    M = 1e6,
+    B = 1e9,
+    T = 1e12,
+}
+
+local function incomeToNumber(text)
+    if not text then return 0 end
+    local t = text:gsub("%$", ""):gsub("/s", ""):gsub(",", ""):gsub("%s+", "")
+    local suffix = t:match("([KMBT])$")
+
+    if suffix then
+        local base = tonumber(t:sub(1, #t - 1))
+        if not base then return 0 end
+        return base * (suffixMul[suffix] or 1)
+    else
+        return tonumber(t) or 0
+    end
+end
+
+-------------------------------------------------
+-- RootPart finder + khoảng cách 2D
+-------------------------------------------------
 local function findRootPart(model)
     local root = model:FindFirstChild("RootPart", true)
               or model:FindFirstChild("FakeRootPart", true)
@@ -60,6 +133,9 @@ end
 -- HÀM CHẠY 1 LẦN LỌC + BÁN, trả về số pet đã bán
 -------------------------------------------------
 local function RunFilterOnce()
+    -- update danh sách pet rebirth required
+    refreshRequiredPets()
+
     local petsByPlot = {}
 
     -- 1) Gom PET
@@ -76,10 +152,12 @@ local function RunFilterOnce()
         end
     end
 
-    -- 2) Gom SLOT
-    local slots = {}
+    -- 2) Gom SLOT (Base + podium) + map pet gần nhất cho slot
+    local slotInfos = {}
+
     for plot, pets in pairs(petsByPlot) do
         if #pets == 0 then continue end
+
         local podiumsFolder = plot:FindFirstChild("AnimalPodiums")
         if podiumsFolder then
             for _, podium in ipairs(podiumsFolder:GetChildren()) do
@@ -97,50 +175,94 @@ local function RunFilterOnce()
                             end
                         end
                     end
+
                     if spot then
-                        table.insert(slots, {
-                            plot  = plot,
-                            index = podium.Name,
-                            part  = spot,
-                        })
+                        -- tìm pet gần nhất cho slot này
+                        local pos = spot.Position
+                        local bestPet, bestDist
+
+                        for _, pet in ipairs(pets) do
+                            local d = flatDist(pet.root.Position, pos)
+                            if not bestDist or d < bestDist then
+                                bestDist = d
+                                bestPet  = pet
+                            end
+                        end
+
+                        if bestPet and bestDist <= MAX_DIST then
+                            table.insert(slotInfos, {
+                                plot    = plot,
+                                podium  = podium,
+                                index   = podium.Name,
+                                part    = spot,
+                                pet     = bestPet,
+                                dist    = bestDist,
+                                incomeN = 0,   -- sẽ fill sau
+                            })
+                        end
                     end
                 end
             end
         end
     end
 
-    -- 3) Map slot -> pet & SELL
-    local totalSell = 0
-
-    for _, slot in ipairs(slots) do
-        local pets = petsByPlot[slot.plot]
-        if pets and #pets > 0 then
-            local pos = slot.part.Position
-            local bestPet, bestDist
-
-            for _, pet in ipairs(pets) do
-                local d = flatDist(pet.root.Position, pos)
-                if not bestDist or d < bestDist then
-                    bestDist = d
-                    bestPet  = pet
+    -- 3) Đọc m/s cho từng slot từ AnimalOverhead để tìm top 5
+    for _, info in ipairs(slotInfos) do
+        local overhead = info.podium:FindFirstChild("AnimalOverhead", true)
+        if overhead then
+            local incomeText
+            for _, inst in ipairs(overhead:GetDescendants()) do
+                if inst:IsA("TextLabel") or inst:IsA("TextBox") then
+                    local t = inst.Text or ""
+                    if t:match("%$.*%/s") then
+                        incomeText = t
+                        break
+                    end
                 end
             end
+            info.incomeN = incomeToNumber(incomeText)
+        else
+            info.incomeN = 0
+        end
+    end
 
-            if bestPet and bestDist <= MAX_DIST then
-                local petName = bestPet.model.Name
-                local slotNum = tonumber(slot.index)
+    -- sort theo income giảm dần để lấy top 5
+    table.sort(slotInfos, function(a, b)
+        return (a.incomeN or 0) > (b.incomeN or 0)
+    end)
 
-                if not shouldKeep(petName) then
-                    totalSell += 1
-                    print(string.format("SELL slot %s | Pet: %s | Dist: %.3f",
-                        slot.index, petName, bestDist))
-                    if (not DRY_RUN) and slotNum then
-                        SellRemote:FireServer(slotNum)
-                    end
-                else
-                    -- debug nếu muốn:
-                    -- print("KEEP", slot.index, petName)
-                end
+    local topIncomeSlots = {}
+    local TOP_COUNT = math.min(5, #slotInfos)
+    for i = 1, TOP_COUNT do
+        local s = slotInfos[i]
+        topIncomeSlots[s.index] = true
+    end
+
+    -- 4) Quyết định SELL hay KEEP
+    local totalSell = 0
+
+    for _, info in ipairs(slotInfos) do
+        local petName = info.pet.model.Name
+        local slotNum = tonumber(info.index)
+
+        local keepByName    = shouldKeepByName(petName)
+        local keepByRebirth = isRebirthRequired(petName)
+        local keepByIncome  = topIncomeSlots[info.index] == true
+
+        if keepByName or keepByRebirth or keepByIncome then
+            -- debug nếu muốn:
+            -- print(string.format("KEEP slot %s | Pet: %s | Dist: %.3f | incomeN: %.0f (name=%s rebirth=%s top5=%s)",
+            --      info.index, petName, info.dist, info.incomeN,
+            --      tostring(keepByName), tostring(keepByRebirth), tostring(keepByIncome)))
+        else
+            totalSell += 1
+            print(string.format(
+                "SELL slot %s | Pet: %s | Dist: %.3f | incomeN: %.0f",
+                info.index, petName, info.dist, info.incomeN
+            ))
+
+            if (not DRY_RUN) and slotNum then
+                SellRemote:FireServer(slotNum)
             end
         end
     end
@@ -154,11 +276,9 @@ end
 while true do
     local sold = RunFilterOnce()
 
-    -- nếu vừa bán được pet => đợi rất ngắn để tiếp tục clear
     if sold > 0 then
-        task.wait(0.5)
+        task.wait(0.5)  -- đang bán nhiều, quét nhanh
     else
-        -- không còn gì để bán thì nghỉ 5s rồi check lại
-        task.wait(1)
+        task.wait(1)    -- hết pet để bán, nghỉ tí rồi check lại
     end
 end
