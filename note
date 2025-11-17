@@ -1,64 +1,65 @@
 local Plots = workspace:WaitForChild("Plots")
 
--- ĐỔI ID PLOT CỦA BẠN Ở ĐÂY
-local PLOT_ID = "168814b7-8d18-4f99-b9ad-74da06f16cfb"
-local plot = Plots:FindFirstChild(PLOT_ID)
-if not plot then
-    warn("Không tìm thấy plot:", PLOT_ID)
-    return
-end
-
 -------------------------------------------------
--- 1) Lấy list pet: Model + FakeRootPart
+-- 1) Gom tất cả PET trong Plots
 -------------------------------------------------
 local pets = {}
 
-for _, m in ipairs(plot:GetChildren()) do
-    if m:IsA("Model") and m.Name ~= "Base" and m.Name ~= "AnimalPodiums" then
-        local root = m:FindFirstChild("FakeRootPart", true)
-        if root and root:IsA("BasePart") then
-            table.insert(pets, {
-                model = m,
-                root  = root,
-            })
+for _, m in ipairs(Plots:GetDescendants()) do
+    if m:IsA("Model") and m:FindFirstChild("FakeRootPart", true) then
+        -- bỏ mấy model nằm trong AnimalPodiums (podium, base...)
+        local p = m
+        local inPodiums = false
+        while p and p ~= Plots do
+            if p.Name == "AnimalPodiums" then
+                inPodiums = true
+                break
+            end
+            p = p.Parent
         end
-    end
-end
-
--------------------------------------------------
--- 2) Lấy list slot: mỗi AnimalPodiums.N.Base.Decorations.Decoration.Part
--------------------------------------------------
-local slots = {}
-
-local podiumsFolder = plot:FindFirstChild("AnimalPodiums")
-if not podiumsFolder then
-    warn("Plot không có AnimalPodiums")
-    return
-end
-
-for _, podium in ipairs(podiumsFolder:GetChildren()) do
-    local base = podium:FindFirstChild("Base")
-    if base then
-        local decos = base:FindFirstChild("Decorations")
-        if decos then
-            local deco = decos:FindFirstChild("Decoration")
-            if deco then
-                local part = deco:FindFirstChild("Part")
-                if part and part:IsA("BasePart") then
-                    table.insert(slots, {
-                        index = podium.Name, -- số thứ tự slot
-                        part  = part,
-                    })
-                end
+        if not inPodiums then
+            local root = m:FindFirstChild("FakeRootPart", true)
+            if root and root:IsA("BasePart") then
+                table.insert(pets, {
+                    model = m,
+                    root  = root,
+                })
             end
         end
     end
 end
 
 -------------------------------------------------
--- 3) Với mỗi slot, tìm pet gần nhất
+-- 2) Gom tất cả SLOT: AnimalPodiums.N.Base.Decorations.Decoration.Part
 -------------------------------------------------
-print("== MAP SLOT -> PET ==")
+local slots = {}
+
+for _, part in ipairs(Plots:GetDescendants()) do
+    if part:IsA("BasePart") and part.Name == "Part" then
+        local p = part
+        local slotIndex
+
+        while p and p ~= Plots do
+            if p.Parent and p.Parent.Name == "AnimalPodiums" then
+                slotIndex = p.Name   -- N trong AnimalPodiums.N
+                break
+            end
+            p = p.Parent
+        end
+
+        if slotIndex then
+            table.insert(slots, {
+                index = slotIndex,
+                part  = part,
+            })
+        end
+    end
+end
+
+-------------------------------------------------
+-- 3) Với mỗi slot, tìm pet gần nhất và in ra
+-------------------------------------------------
+print("== SLOT -> PET (toàn server) ==")
 
 for _, slot in ipairs(slots) do
     local pos = slot.part.Position
