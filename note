@@ -4,9 +4,27 @@ local DRY_RUN  = false      -- true = chỉ in log, false = bán thật
 
 -- Danh sách pet CẦN GIỮ (dạng list, sửa tên ở đây)
 local KEEP_LIST = {
-    "Tentacolo Tecnico",
-    "Cupcake Koala",
-    "Pet 3",
+    "Tralaledon",
+    "Los Primos",
+    "Eviledon",
+    "Orcaledon",
+    "Capitano Moby",
+    "Secret Lucky Block",
+    "Admin Lucky Block",
+    "Spooky Lucky Block",
+    "Los Lucky Blocks",
+    "Garama and Madundung",
+    "Dragon Cannelloni",
+    "Money Money Puggy",
+    "Nuclearo Dinossauro",
+    "Ketchuru and Musturu",
+    "Strawberry Elephant",
+    "Meowl",
+    "Tang Tang keletang",
+    "Chicleteira Bicicleteira",
+    "Nooo My Hotspot",
+    "Ketupat Kepat",
+    "Tictac Sahur",
 }
 
 local ignoreNames = {
