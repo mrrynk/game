@@ -1,13 +1,14 @@
 local Plots = workspace:WaitForChild("Plots")
 
+print("=== DEBUG SLOT / PET START ===")
+
 -------------------------------------------------
--- 1) Gom tất cả PET có FakeRootPart trong Plots
+-- 1) PET: model có FakeRootPart (không nằm trong AnimalPodiums)
 -------------------------------------------------
 local pets = {}
 
 for _, m in ipairs(Plots:GetDescendants()) do
     if m:IsA("Model") and m:FindFirstChild("FakeRootPart", true) then
-        -- bỏ mấy model nằm trong AnimalPodiums (Base, Spawn ...)
         local p, inPodiums = m, false
         while p and p ~= Plots do
             if p.Name == "AnimalPodiums" then
@@ -20,69 +21,111 @@ for _, m in ipairs(Plots:GetDescendants()) do
         if not inPodiums then
             local root = m:FindFirstChild("FakeRootPart", true)
             if root and root:IsA("BasePart") then
-                table.insert(pets, {root = root})
+                table.insert(pets, {model = m, root = root})
+                print("[PET]", m.Name,
+                      "| ROOT:", root:GetFullName(),
+                      "| POS:", root.Position)
             end
         end
     end
 end
 
+print("Tổng PET tìm được:", #pets)
+
 -------------------------------------------------
--- 2) Gom tất cả SLOT + tên pet từ AnimalOverhead.DisplayName
+-- 2) SLOT: AnimalPodiums.N.Base.Decorations.Decoration.Part
+--    + debug GUI AnimalOverhead
 -------------------------------------------------
 local slots = {}
 
 for _, podium in ipairs(Plots:GetDescendants()) do
     if podium.Parent and podium.Parent.Name == "AnimalPodiums" then
-        local base = podium:FindFirstChild("Base")
-        if base then
-            local decos = base:FindFirstChild("Decorations")
-            local deco  = decos and decos:FindFirstChild("Decoration")
-            local part  = deco and deco:FindFirstChild("Part")
+        print("\n[PODIUM CANDIDATE]", podium:GetFullName())
 
-            -- GUI AnimalOverhead trong podium
-            local overhead = podium:FindFirstChild("AnimalOverhead", true)
-            local petName
-            if overhead then
-                local disp = overhead:FindFirstChild("DisplayName", true)
-                if disp and disp:IsA("TextLabel") then
-                    petName = disp.Text
+        local base = podium:FindFirstChild("Base")
+        if not base then
+            print("  !! Không có Base")
+            continue
+        end
+
+        local decos = base:FindFirstChild("Decorations")
+        if not decos then
+            print("  !! Không có Base.Decorations")
+            continue
+        end
+
+        local deco = decos:FindFirstChild("Decoration")
+        if not deco then
+            print("  !! Không có Decorations.Decoration")
+            continue
+        end
+
+        local part = deco:FindFirstChild("Part")
+        if not part or not part:IsA("BasePart") then
+            print("  !! Không có Decoration.Part")
+            continue
+        end
+
+        print("  SlotPart:", part:GetFullName(), "POS:", part.Position)
+
+        -- tìm GUI AnimalOverhead dưới podium này
+        local overhead =
+            base:FindFirstChild("AnimalOverhead", true)
+            or podium:FindFirstChild("AnimalOverhead", true)
+
+        if not overhead then
+            print("  !! KHÔNG THẤY AnimalOverhead dưới podium này")
+        else
+            print("  Overhead:", overhead:GetFullName())
+            -- liệt kê toàn bộ label bên trong để xem tên nào là DisplayName
+            for _, inst in ipairs(overhead:GetDescendants()) do
+                if inst:IsA("TextLabel") then
+                    print("    Label", inst.Name, "=>", inst.Text)
                 end
             end
 
-            if part and petName and petName ~= "" then
+            local disp = overhead:FindFirstChild("DisplayName", true)
+            local petName = disp and disp.Text or "(KHÔNG THẤY DisplayName)"
+
+            print("  => petName (GUI):", petName)
+
+            if disp and disp.Text ~= "" then
                 table.insert(slots, {
-                    index   = podium.Name,   -- số slot
+                    index   = podium.Name,
                     part    = part,
-                    petName = petName,
+                    petName = disp.Text,
                 })
             end
         end
     end
 end
 
--------------------------------------------------
--- 3) Với mỗi slot: tìm pet gần nhất, nếu dist <= 3 thì in
--------------------------------------------------
-local MAX_DIST = 3
+print("\nTổng SLOT có tên pet (GUI):", #slots)
 
-print("== SLOT | PET | DIST (<= 3) ==")
-
+-------------------------------------------------
+-- 3) Khoảng cách slot ↔ pet gần nhất (debug)
+-------------------------------------------------
 for _, slot in ipairs(slots) do
     local pos = slot.part.Position
-    local bestDist
+    local bestPet, bestDist
 
     for _, pet in ipairs(pets) do
         local d = (pet.root.Position - pos).Magnitude
         if not bestDist or d < bestDist then
             bestDist = d
+            bestPet  = pet
         end
     end
 
-    if bestDist and bestDist <= MAX_DIST then
-        print(
-            "Slot:", slot.index,
-            "| Pet:", slot.petName,
-            "| Dist:", string.format("%.2f", bestDist)
-        )
+    if bestPet then
+        print(string.format(
+            "Slot %s | GUI Name: %s | Model: %s | Dist: %.2f",
+            slot.index,
+            slot.petName,
+            bestPet.model.Name,
+            bestDist
+        ))
     end
 end
+
+print("=== DEBUG END ===")
