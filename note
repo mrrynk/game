@@ -1,6 +1,6 @@
 --== CONFIG ==========================================
 local MAX_DIST = 3          -- khoảng cách 2D tối đa coi là đứng trên slot
-local DRY_RUN  = true       -- true = chỉ in log, false = bán thật
+local DRY_RUN  = false       -- true = chỉ in log, false = bán thật
 
 -- Danh sách pet CẦN GIỮ (dạng list, sửa tên ở đây)
 local KEEP_LIST = {
