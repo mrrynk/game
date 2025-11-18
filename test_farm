@@ -22,7 +22,6 @@ local EQUIP_SLOT_KEYS = {
     Enum.KeyCode.Seven,
     Enum.KeyCode.Eight,
     Enum.KeyCode.Nine,
-    Enum.KeyCode.Ten,
 }
 
 -- AUTO LỌC / BÁN PET
