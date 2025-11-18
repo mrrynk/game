@@ -398,29 +398,33 @@ task.spawn(function()
 end)
 
 -------------------------------------------------
--- 4) XOÁ MAP (LÀM TRONG SUỐT)
+-- 4) LÀM MAP TRONG SUỐT (KHÔNG XOÁ, KHÔNG TẮT VA CHẠM)
 -------------------------------------------------
 task.spawn(function()
     local lp = LocalPlayer
 
     local function handleInst(inst)
-        -- bỏ qua nhân vật của mình cho đỡ tàng hình luôn
+        -- Bỏ qua nhân vật của mình (để không tàng hình chính mình)
         local char = lp.Character
         if char and (inst == char or inst:IsDescendantOf(char)) then
             return
         end
 
         if inst:IsA("BasePart") then
-            inst.LocalTransparencyModifier = 1  -- chỉ client bạn thấy trong suốt
-            inst.CanCollide = false
+            -- Chỉ làm trong suốt bên client
+            pcall(function()
+                inst.LocalTransparencyModifier = 1
+            end)
+            -- Nếu cần, có thể fallback:
+            -- inst.Transparency = 1
         end
     end
 
-    -- áp dụng cho toàn bộ hiện có
+    -- Áp dụng cho tất cả part hiện có
     for _, inst in ipairs(workspace:GetDescendants()) do
         handleInst(inst)
     end
 
-    -- mọi thứ spawn sau này cũng auto trong suốt
+    -- Mọi thứ spawn sau cũng tự trong suốt
     workspace.DescendantAdded:Connect(handleInst)
 end)
