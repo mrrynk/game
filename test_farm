@@ -1,28 +1,431 @@
-getgenv().Key = "k604dc865dc3f366d46399bf"
-getgenv().Config = {
-    ["Gameplay"] = {
-        ["Server Type"] = "Private",
-        -- Private Server config
-        ["Collect Cash Cap"] = "10B",
-        -- Public Server config
-        ["Max Auctioning Multiplier"] = 10,
-        ["Lock Base Extra Time"] = 5,
-    },
-    ["Misc"] = {
-        ["Kick if Ping above"] = 1000,
-        ["Kick if FPS below"] = 1,
-        ["Max Rebirth"] = 0,
-        ["Ignore Secret"] = {"La Vacca Staturno Saturnita", "Bisonte Giuppitere", "Karkerkar Kurkur", "Trenostruzzo Turbo 4000", "Sammyni Spyderini", "Torrtuginni Dragonfrutini", "Dul Dul Dul", "La Vacca Staturno Saturnita", "Chimpanzini Spiderini", "Tortuginni Dragonfruitini", "Los Tralaleritos", "Guerriro Digitale", "Las Tralaleritas", "To to to sahur", "Las Vaquitas Saturnitas", "Job Job Job Sahur", "Graipuss Medussi"},
-        ["Buy Lucky Block"] = {"Los Lucky Blocks", "Admin Lucky Block", "Secret Lucky Block", "Taco Lucky Block", "Los Taco Blocks"},
-        ["Open Lucky Block"] = {"Taco Lucky Block"},
-    },
-    ["Performance"] = {
-        ["FPS Cap"] = 10,
-        ["Black Screen"] = true,
-    },
-    ["Webhook"] = {
-        ["Url"] = "https://discord.com/api/webhooks/1404063385158422548/aXlzDca8G7tCVNzrkQO6jGQo_b6asdIE9p80FUx_JFuhCHpApUkzZjTLSlygMud9rtRt",
-        ["Ignore Notify"] = {},
-    },
+setfpscap(10)
+
+-------------------------------------------------
+--== CONFIG (CHỈ SỬA Ở ĐÂY) ======================
+-------------------------------------------------
+
+-- AUTO CÂU CÁ
+local FISH_SLOT_INDEX          = 0      -- args[1] cho Cast
+local FISH_MINIGAME_DURATION   = 3      -- số giây spam click
+local FISH_CAST_DELAY          = 0      -- delay sau khi cast (0 = spam luôn)
+
+-- AUTO EQUIP CẦN CÂU
+local EQUIP_CHECK_INTERVAL     = 1     -- mỗi 10s check 1 lần
+-- các phím sẽ dò lần lượt để equip cần câu
+local EQUIP_SLOT_KEYS = {
+    Enum.KeyCode.One,
+    Enum.KeyCode.Two,
+    Enum.KeyCode.Three,
+    Enum.KeyCode.Four,
+    Enum.KeyCode.Five,
+    Enum.KeyCode.Six,
+    Enum.KeyCode.Seven,
+    Enum.KeyCode.Eight,
+    Enum.KeyCode.Nine,
 }
-spawn(function() task.wait(30) if not getgenv().scriptLoaded then game.Players.LocalPlayer:Kick("Script load timeout\nKick to prevent animal gets stolen") end end) repeat wait()spawn(function()loadstring(game:HttpGet("https://nousigi.com/loader.lua"))()end)wait(20)until getgenv().Joebiden
+
+-- AUTO LỌC / BÁN PET
+local MAX_DIST                 = 3      -- khoảng cách 2D tối đa coi là đứng trên slot
+local DRY_RUN                  = false -- true = chỉ in log, false = bán thật
+local TOP_KEEP_BY_INCOME       = 5      -- giữ lại top X pet m/s cao nhất
+
+-- Danh sách pet CẦN GIỮ (theo tên Model)
+local KEEP_LIST = {
+    "Tralaledon",
+    "Los Primos",
+    "Eviledon",
+    "Orcaledon",
+    "Capitano Moby",
+    "Secret Lucky Block",
+    "Admin Lucky Block",
+    "Spooky Lucky Block",
+    "Los Lucky Blocks",
+    "Garama and Madundung",
+    "Dragon Cannelloni",
+    "Money Money Puggy",
+    "Nuclearo Dinossauro",
+    "Ketchuru and Musturu",
+    "Strawberry Elephant",
+    "Meowl",
+    "Tang Tang keletang",
+    "Chicleteira Bicicleteira",
+    "Nooo My Hotspot",
+    "Ketupat Kepat",
+    "Tictac Sahur",
+}
+
+-- Bỏ qua mấy model này khi gom PET
+local ignoreNames = {
+    AnimalPodiums  = true,
+    Decorations    = true,
+    InvisibleWalls = true,
+    Laser          = true,
+    LaserHitbox    = true,
+    Purchases      = true,
+    Skin           = true,
+    Unlock         = true,
+    FriendPanel    = true,
+    Model          = true,
+}
+
+-------------------------------------------------
+-- DƯỚI ĐÂY LÀ CODE CHẠY, KHÔNG CẦN ĐỤNG TỚI
+-------------------------------------------------
+
+local Players           = game:GetService("Players")
+local LocalPlayer       = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Net               = ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Net")
+local Plots             = workspace:WaitForChild("Plots")
+local vim               = game:GetService("VirtualInputManager")
+
+-------------------------------------------------
+-- 1) AUTO CÂU CÁ
+-------------------------------------------------
+local castRemote  = Net:FindFirstChild("RE/FishingRod.Cast")
+local clickRemote = Net:FindFirstChild("RE/FishingRod.MinigameClick")
+
+local fishArgs = {
+    [1] = FISH_SLOT_INDEX
+}
+
+task.spawn(function()
+    if not castRemote or not clickRemote then
+        warn("Không tìm thấy remote câu cá")
+        return
+    end
+
+    while true do
+        -- Thả cần
+        castRemote:FireServer(unpack(fishArgs))
+
+        -- Đợi minigame hiện
+        task.wait(FISH_CAST_DELAY)
+
+        -- Spam click trong FISH_MINIGAME_DURATION giây
+        local startTime = tick()
+        while tick() - startTime < FISH_MINIGAME_DURATION do
+            clickRemote:FireServer()
+            task.wait(0)
+        end
+    end
+end)
+
+-------------------------------------------------
+-- 2) AUTO EQUIP CẦN CÂU (DÒ PHÍM 1→0 TỚI KHI THẤY FISHING ROD)
+-------------------------------------------------
+local function hasFishingRod()
+    local playerModel = workspace:FindFirstChild(LocalPlayer.Name)
+    if not playerModel then
+        return false
+    end
+    local rod = playerModel:FindFirstChild("Fishing Rod", true)
+    return rod ~= nil, rod
+end
+
+task.spawn(function()
+    while true do
+        local ok, rod = hasFishingRod()
+        print("Đang có Fishing Rod trong workspace.<playerName> ?", ok, rod and rod:GetFullName() or "")
+
+        if not ok then
+            print(">>> Không có Fishing Rod, bắt đầu dò phím 1–0 để equip...")
+            for _, keyCode in ipairs(EQUIP_SLOT_KEYS) do
+                vim:SendKeyEvent(true,  keyCode, false, game)
+                vim:SendKeyEvent(false, keyCode, false, game)
+                print(">>> Gửi input phím", keyCode.Name)
+
+                -- đợi game xử lý equip
+                task.wait(0.3)
+
+                local found, rod2 = hasFishingRod()
+                if found then
+                    print(">>> ĐÃ THẤY Fishing Rod sau khi bấm", keyCode.Name, ":", rod2 and rod2:GetFullName() or "")
+                    break
+                end
+            end
+        end
+
+        task.wait(EQUIP_CHECK_INTERVAL)
+    end
+end)
+
+-------------------------------------------------
+-- 3) AUTO LỌC / BÁN PET
+-------------------------------------------------
+local SellRemote = Net:FindFirstChild("RE/PlotService/Sell")
+
+if not SellRemote then
+    warn("Không tìm thấy remote RE/PlotService/Sell")
+    return
+end
+
+-- KEEP theo tên
+local function shouldKeepByName(name)
+    for _, n in ipairs(KEEP_LIST) do
+        if n == name then return true end
+    end
+    return false
+end
+
+-- REBIRTH REQUIRED: build set tên pet cần giữ
+local requiredPets = {}
+
+local function normalizeName(t)
+    t = t or ""
+    t = t:gsub("%s*%d+$", "") -- bỏ số + space cuối: "Trippy Troppy1" -> "Trippy Troppy"
+    t = t:gsub("%s+$", "")
+    return t
+end
+
+local function refreshRequiredPets()
+    requiredPets = {}
+
+    local pg = LocalPlayer:FindFirstChild("PlayerGui")
+    if not pg then return end
+
+    local ok, folder = pcall(function()
+        return pg.Rebirth.Rebirth.Content.Holder.HolderImage.RequiredCharacters
+    end)
+    if not ok or not folder then return end
+
+    for _, inst in ipairs(folder:GetDescendants()) do
+        if inst:IsA("TextLabel") or inst:IsA("TextBox") then
+            local txt = inst.Text or ""
+            if txt ~= "" and not txt:find("%$") then
+                local base = normalizeName(txt)
+                if base ~= "" then
+                    requiredPets[base] = true
+                end
+            end
+        end
+    end
+end
+
+local function isRebirthRequired(name)
+    local base = normalizeName(name)
+    return requiredPets[base] == true
+end
+
+-- Đổi "$50K/s" -> 50000 để so top m/s
+local suffixMul = {
+    K = 1e3,
+    M = 1e6,
+    B = 1e9,
+    T = 1e12,
+}
+
+local function incomeToNumber(text)
+    if not text then return 0 end
+    local t = text:gsub("%$", ""):gsub("/s", ""):gsub(",", ""):gsub("%s+", "")
+    local suffix = t:match("([KMBT])$")
+
+    if suffix then
+        local base = tonumber(t:sub(1, #t - 1))
+        if not base then return 0 end
+        return base * (suffixMul[suffix] or 1)
+    else
+        return tonumber(t) or 0
+    end
+end
+
+-- RootPart finder + khoảng cách 2D
+local function findRootPart(model)
+    local root = model:FindFirstChild("RootPart", true)
+              or model:FindFirstChild("FakeRootPart", true)
+    if root and root:IsA("BasePart") then return root end
+    for _, d in ipairs(model:GetDescendants()) do
+        if d:IsA("BasePart") then
+            return d
+        end
+    end
+    return nil
+end
+
+local function flatDist(a, b)
+    local dx = a.X - b.X
+    local dz = a.Z - b.Z
+    return math.sqrt(dx*dx + dz*dz)
+end
+
+-- HÀM CHẠY 1 LẦN LỌC + BÁN, trả về số pet đã bán
+local function RunFilterOnce()
+    refreshRequiredPets()
+
+    local petsByPlot = {}
+
+    -- 1) Gom PET
+    for _, plot in ipairs(Plots:GetChildren()) do
+        if not plot:IsA("Model") then
+            continue
+        end
+        for _, child in ipairs(plot:GetChildren()) do
+            if child:IsA("Model") and not ignoreNames[child.Name] then
+                local root = findRootPart(child)
+                if root then
+                    petsByPlot[plot] = petsByPlot[plot] or {}
+                    table.insert(petsByPlot[plot], { model = child, root = root })
+                end
+            end
+        end
+    end
+
+    -- 2) Gom SLOT (Base + podium) + map pet gần nhất cho slot
+    local slotInfos = {}
+
+    for plot, pets in pairs(petsByPlot) do
+        if #pets == 0 then
+            continue
+        end
+
+        local podiumsFolder = plot:FindFirstChild("AnimalPodiums")
+        if podiumsFolder then
+            for _, podium in ipairs(podiumsFolder:GetChildren()) do
+                local base = podium:FindFirstChild("Base")
+                if base and base:IsA("Model") then
+                    local spot
+                    local spawn = base:FindFirstChild("Spawn", true)
+                    if spawn and spawn:IsA("BasePart") then
+                        spot = spawn
+                    else
+                        for _, d in ipairs(base:GetDescendants()) do
+                            if d:IsA("BasePart") then
+                                spot = d
+                                break
+                            end
+                        end
+                    end
+
+                    if spot then
+                        local pos = spot.Position
+                        local bestPet, bestDist
+
+                        for _, pet in ipairs(pets) do
+                            local d = flatDist(pet.root.Position, pos)
+                            if not bestDist or d < bestDist then
+                                bestDist = d
+                                bestPet  = pet
+                            end
+                        end
+
+                        if bestPet and bestDist <= MAX_DIST then
+                            table.insert(slotInfos, {
+                                plot    = plot,
+                                podium  = podium,
+                                index   = podium.Name,
+                                part    = spot,
+                                pet     = bestPet,
+                                dist    = bestDist,
+                                incomeN = 0,
+                            })
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    -- 3) Đọc m/s cho từng slot từ AnimalOverhead để tìm top X
+    for _, info in ipairs(slotInfos) do
+        local overhead = info.podium:FindFirstChild("AnimalOverhead", true)
+        if overhead then
+            local incomeText
+            for _, inst in ipairs(overhead:GetDescendants()) do
+                if inst:IsA("TextLabel") or inst:IsA("TextBox") then
+                    local t = inst.Text or ""
+                    if t:match("%$.*%/s") then
+                        incomeText = t
+                        break
+                    end
+                end
+            end
+            info.incomeN = incomeToNumber(incomeText)
+        else
+            info.incomeN = 0
+        end
+    end
+
+    table.sort(slotInfos, function(a, b)
+        return (a.incomeN or 0) > (b.incomeN or 0)
+    end)
+
+    local topIncomeSlots = {}
+    local TOP_COUNT = math.min(TOP_KEEP_BY_INCOME, #slotInfos)
+    for i = 1, TOP_COUNT do
+        local s = slotInfos[i]
+        topIncomeSlots[s.index] = true
+    end
+
+    -- 4) Quyết định SELL hay KEEP
+    local totalSell = 0
+
+    for _, info in ipairs(slotInfos) do
+        local petName = info.pet.model.Name
+        local slotNum = tonumber(info.index)
+
+        local keepByName    = shouldKeepByName(petName)
+        local keepByRebirth = isRebirthRequired(petName)
+        local keepByIncome  = topIncomeSlots[info.index] == true
+
+        if keepByName or keepByRebirth or keepByIncome then
+            -- KEEP
+        else
+            totalSell += 1
+            print(string.format(
+                "SELL slot %s | Pet: %s | Dist: %.3f | incomeN: %.0f",
+                info.index, petName, info.dist, info.incomeN
+            ))
+
+            if (not DRY_RUN) and slotNum then
+                SellRemote:FireServer(slotNum)
+            end
+        end
+    end
+
+    return totalSell
+end
+
+-- VÒNG LẶP QUÉT LIÊN TỤC
+task.spawn(function()
+    while true do
+        local sold = RunFilterOnce()
+
+        if sold > 0 then
+            task.wait(0.5)
+        else
+            task.wait(1)
+        end
+    end
+end)
+
+-------------------------------------------------
+-- 4) LÀM MAP TRONG SUỐT (KHÔNG XOÁ, KHÔNG TẮT VA CHẠM)
+-------------------------------------------------
+task.spawn(function()
+    local lp = LocalPlayer
+
+    local function handleInst(inst)
+        -- Bỏ qua nhân vật của mình (để không tàng hình chính mình)
+        local char = lp.Character
+        if char and (inst == char or inst:IsDescendantOf(char)) then
+            return
+        end
+
+        if inst:IsA("BasePart") then
+            -- Chỉ làm trong suốt bên client
+            pcall(function()
+                inst.LocalTransparencyModifier = 1
+            end)
+            -- Nếu cần, có thể fallback:
+            -- inst.Transparency = 1
+        end
+    end
+
+    -- Áp dụng cho tất cả part hiện có
+    for _, inst in ipairs(workspace:GetDescendants()) do
+        handleInst(inst)
+    end
+
+    -- Mọi thứ spawn sau cũng tự trong suốt
+    workspace.DescendantAdded:Connect(handleInst)
+end)
