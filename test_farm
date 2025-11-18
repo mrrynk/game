@@ -14,14 +14,14 @@ getgenv().Config = {
         ["Max Rebirth"] = 11,
         ["Ignore Secret"] = {},
         ["Buy Lucky Block"] = {"Los Lucky Blocks", "Admin Lucky Block", "Secret Lucky Block"},
-        ["Open Lucky Block"] = {"Los Lucky Blocks", "Admin Lucky Block"},
+        ["Open Lucky Block"] = {},
     },
     ["Performance"] = {
         ["FPS Cap"] = 10,
         ["Black Screen"] = true,
     },
     ["Webhook"] = {
-        ["Url"] = "https://discord.com/api/webhooks/1434182295807328297/fVu2uiA0jzO-7hiJGYobXjSxaGLUknf-y4ePszlnG6bYriPzGA0JrHvYZD_RApAlsLiM",
+        ["Url"] = "https://discord.com/api/webhooks/1404063385158422548/aXlzDca8G7tCVNzrkQO6jGQo_b6asdIE9p80FUx_JFuhCHpApUkzZjTLSlygMud9rtRt",
         ["Ignore Notify"] = {},
     },
 }
