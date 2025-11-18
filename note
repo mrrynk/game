@@ -8,7 +8,7 @@ local FISH_MINIGAME_DURATION   = 3      -- số giây spam click
 local FISH_CAST_DELAY          = 0      -- delay sau khi cast (0 = spam luôn)
 
 -- AUTO EQUIP CẦN CÂU
-local EQUIP_KEYCODE            = Enum.KeyCode.Three  -- phím để equip (slot 2)
+local EQUIP_KEYCODE            = Enum.KeyCode.Two  -- phím để equip (slot 2)
 local EQUIP_CHECK_INTERVAL     = 10     -- mỗi 10s check 1 lần
 
 -- AUTO LỌC / BÁN PET
