@@ -8,8 +8,20 @@ local FISH_MINIGAME_DURATION   = 3      -- số giây spam click
 local FISH_CAST_DELAY          = 0      -- delay sau khi cast (0 = spam luôn)
 
 -- AUTO EQUIP CẦN CÂU
-local EQUIP_KEYCODE            = Enum.KeyCode.Three  -- phím để equip (slot 2)
-local EQUIP_CHECK_INTERVAL     = 10     -- mỗi 10s check 1 lần
+local EQUIP_CHECK_INTERVAL     = 1     -- mỗi 10s check 1 lần
+-- các phím sẽ dò lần lượt để equip cần câu
+local EQUIP_SLOT_KEYS = {
+    Enum.KeyCode.One,
+    Enum.KeyCode.Two,
+    Enum.KeyCode.Three,
+    Enum.KeyCode.Four,
+    Enum.KeyCode.Five,
+    Enum.KeyCode.Six,
+    Enum.KeyCode.Seven,
+    Enum.KeyCode.Eight,
+    Enum.KeyCode.Nine,
+    Enum.KeyCode.Zero,
+}
 
 -- AUTO LỌC / BÁN PET
 local MAX_DIST                 = 3      -- khoảng cách 2D tối đa coi là đứng trên slot
@@ -41,6 +53,7 @@ local KEEP_LIST = {
     "Tictac Sahur",
 }
 
+-- Bỏ qua mấy model này khi gom PET
 local ignoreNames = {
     AnimalPodiums  = true,
     Decorations    = true,
@@ -98,7 +111,7 @@ task.spawn(function()
 end)
 
 -------------------------------------------------
--- 2) AUTO EQUIP CẦN CÂU (NẾU MẤT FISHING ROD THÌ BẤM PHÍM EQUIP_KEYCODE)
+-- 2) AUTO EQUIP CẦN CÂU (DÒ PHÍM 1→0 TỚI KHI THẤY FISHING ROD)
 -------------------------------------------------
 local function hasFishingRod()
     local playerModel = workspace:FindFirstChild(LocalPlayer.Name)
@@ -115,10 +128,21 @@ task.spawn(function()
         print("Đang có Fishing Rod trong workspace.<playerName> ?", ok, rod and rod:GetFullName() or "")
 
         if not ok then
-            -- KHÔNG có cần câu -> giả bấm phím EQUIP_KEYCODE để equip slot tương ứng
-            vim:SendKeyEvent(true,  EQUIP_KEYCODE, false, game)
-            vim:SendKeyEvent(false, EQUIP_KEYCODE, false, game)
-            print(">>> Không có Fishing Rod, gửi input phím", tostring(EQUIP_KEYCODE), "để equip")
+            print(">>> Không có Fishing Rod, bắt đầu dò phím 1–0 để equip...")
+            for _, keyCode in ipairs(EQUIP_SLOT_KEYS) do
+                vim:SendKeyEvent(true,  keyCode, false, game)
+                vim:SendKeyEvent(false, keyCode, false, game)
+                print(">>> Gửi input phím", keyCode.Name)
+
+                -- đợi game xử lý equip
+                task.wait(0.3)
+
+                local found, rod2 = hasFishingRod()
+                if found then
+                    print(">>> ĐÃ THẤY Fishing Rod sau khi bấm", keyCode.Name, ":", rod2 and rod2:GetFullName() or "")
+                    break
+                end
+            end
         end
 
         task.wait(EQUIP_CHECK_INTERVAL)
@@ -210,7 +234,9 @@ local function findRootPart(model)
               or model:FindFirstChild("FakeRootPart", true)
     if root and root:IsA("BasePart") then return root end
     for _, d in ipairs(model:GetDescendants()) do
-        if d:IsA("BasePart") then return d end
+        if d:IsA("BasePart") then
+            return d
+        end
     end
     return nil
 end
@@ -229,7 +255,9 @@ local function RunFilterOnce()
 
     -- 1) Gom PET
     for _, plot in ipairs(Plots:GetChildren()) do
-        if not plot:IsA("Model") then continue end
+        if not plot:IsA("Model") then
+            continue
+        end
         for _, child in ipairs(plot:GetChildren()) do
             if child:IsA("Model") and not ignoreNames[child.Name] then
                 local root = findRootPart(child)
@@ -245,7 +273,9 @@ local function RunFilterOnce()
     local slotInfos = {}
 
     for plot, pets in pairs(petsByPlot) do
-        if #pets == 0 then continue end
+        if #pets == 0 then
+            continue
+        end
 
         local podiumsFolder = plot:FindFirstChild("AnimalPodiums")
         if podiumsFolder then
@@ -365,4 +395,32 @@ task.spawn(function()
             task.wait(1)
         end
     end
+end)
+
+-------------------------------------------------
+-- 4) XOÁ MAP (LÀM TRONG SUỐT)
+-------------------------------------------------
+task.spawn(function()
+    local lp = LocalPlayer
+
+    local function handleInst(inst)
+        -- bỏ qua nhân vật của mình cho đỡ tàng hình luôn
+        local char = lp.Character
+        if char and (inst == char or inst:IsDescendantOf(char)) then
+            return
+        end
+
+        if inst:IsA("BasePart") then
+            inst.LocalTransparencyModifier = 1  -- chỉ client bạn thấy trong suốt
+            inst.CanCollide = false
+        end
+    end
+
+    -- áp dụng cho toàn bộ hiện có
+    for _, inst in ipairs(workspace:GetDescendants()) do
+        handleInst(inst)
+    end
+
+    -- mọi thứ spawn sau này cũng auto trong suốt
+    workspace.DescendantAdded:Connect(handleInst)
 end)
