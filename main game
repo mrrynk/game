@@ -27,7 +27,7 @@ getgenv().gagConfig = {
     
     BUY_EGGS = { "Gem Egg", "Spooky Egg", "Jungle Egg", "Bug Egg", "Bee Egg", "Paradise Egg", "Zen Egg", "Safari Egg", "Rare Egg", "Common Egg", "Uncommon Egg", "Mythical Egg", "Legendary Egg" },
 
-    PLANT_EGGS = { "Gem Egg", "Paradise Egg", "Safari Egg", "Spooky Egg", "Jungle Egg" },
+    PLANT_EGGS = { "Gem Egg", "Rare Egg", "Paradise Egg", "Safari Egg", "Spooky Egg", "Jungle Egg" },
     -- PLANT_EGGS = { "Paradise Egg", "Safari Egg", "Spooky Egg", "Jungle Egg" },
     
     BUY_SEED_SHOP = { 
