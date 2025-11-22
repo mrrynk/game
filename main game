@@ -1,156 +1,35 @@
-script_key="anzjDPeGYBzGNMCrGyChFxeemCzOGNEj";
-setfpscap(2)
-
-getgenv().gagConfig = {
-    BUY_TRAVELING_MERCHANT = { "Bee Egg", "Paradise Egg", "Fall Egg", "Loquat", "Feijoa", "Pitcher Plant" },
-    BUY_EVENT_SHOP = { "Gem Egg", "Safari Egg", "Lion" },
-    CRAFT_EVENT = { "Gem Egg", "Cheetah" },
-	IGNORE_SUBMIT_EVENT_FORGE = { "Rare Egg", "Gem Egg", "Coal", "Grandmaster Sprinkler", "Master Sprinkler", "Godly Sprinkler", "Advanced Sprinkler", "Basic Sprinkler", "Trading Ticket", "Watering Can", "Levelup Lollipop", "Spooky Egg", "Jungle Egg", "Bug Egg", "Paradise Egg", "Zen Egg", "Safari Egg", "Sprout Egg", "Common Egg"},
-    MAX_PLANTS = 200,
-    DESTROY_UNTIL_MIN_PLANTS = 190,
-    KEEP_SEEDS = { "Bone Blossom" },
-    KEEP_SEEDS_AFTER_MAX_PLANTS = {},
-
-    PLACE_COSMETIC = { "Cooking Kit" },
-    
-    -- General:
-    AUTO_UPDATE_RESTART = true,
-    REDEEM_CODES = {},
-    EXTRA_PET_SLOTS = 5,
-    EXTRA_EGG_SLOTS = 5,
-    MAX_REBIRTH_SHECKLES = 0,
-    ADD_FRIEND = true,
-    OPEN_ALL_SEED_PACK = true,
-	COLLECT_FRUIT_PER_SECOND = 3,
-
-    BUY_COSMETIC_SHOP = { ["Cooking Kit"] = 3 },
-    
-    BUY_EGGS = { "Gem Egg", "Spooky Egg", "Jungle Egg", "Bug Egg", "Bee Egg", "Paradise Egg", "Zen Egg", "Safari Egg", "Rare Egg", "Common Egg", "Uncommon Egg", "Mythical Egg", "Legendary Egg" },
-
-    PLANT_EGGS = { "Gem Egg", "Rare Egg", "Paradise Egg", "Safari Egg", "Spooky Egg", "Jungle Egg" },
-    -- PLANT_EGGS = { "Paradise Egg", "Safari Egg", "Spooky Egg", "Jungle Egg" },
-    
-    BUY_SEED_SHOP = { 
-        "Great Pumpkin", "Crimson Thorn", "Romanesco", "Elder Strawberry",
-        "Giant Pinecone", "Burning Bud", "Sugar Apple", "Ember Lily",
-        "Beanstalk", "Cacao", "Pepper", "Mushroom", "Grape", "Mango",
-        "Dragon Fruit", "Cactus",
-        ["Coconut"] = 50, ["Bamboo"] = 50, ["Apple"] = 50, ["Pumpkin"] = 50,
-        ["Watermelon"] = 50, ["Daffodil"] = 50, ["Corn"] = 50, ["Tomato"] = 50,
-        ["Orange Tulip"] = 50, ["Blueberry"] = 50, ["Strawberry"] = 50, ["Carrot"] = 50
-    },  -- <== THÊM DẤU PHẨY Ở ĐÂY
-
-    FAVOURITE_FRUIT_MUTATIONS = {},  -- Stop Autosell
-    SKIP_HARVEST_MUTATIONS = {},     -- Stop Harvest
-
-    KEEP_PETS = { 
-		"Goblin Miner",
-        "Ruby Squid",
-        "Diamond Panther",
-        "Lion",
-        "Elephant", 
-        "Mummy",
-        "Lich",
-        "Goat",
-        "Headless Horseman", 
-        "Chicken Zombie", 
-        "Chinchilla",
-        "Mizuchi",
-        "Tiger",
-        "Swan",
-        "Phoenix",
-        "Cockatrice",
-        "Griffin",
-        "Golden Goose",
-        "Lobster Thermidor",
-        "French Fry Ferret",
-        "Corrupted Kitsune",
-        "Kitsune",
-        "Dilophosaurus",
-        "Moon Cat",
-        "Spinosaurus",
-        "T-Rex",
-        "Disco Bee",
-        "Butterfly",
-        "Queen Bee",
-        "Dragonfly",
-        "Raccoon",
-        "Fennec Fox",
-        "Mimic Octopus",
-        "Red Fox",
-        "Blood Owl",
-        "Capybara",
-        "Hydra",
-        "Scarlet Macaw",
-        "Ostrich",
-		"Rhino",
-		"Peacock",
-        ["Orange Tabby"] = 2,
-        ["Red Panda"] = 10,
-        ["Starfish"] = 8,
-        ["Shiba Inu"] = 1,
-        ["Blood Kiwi"] = 2,
-        ["Rooster"] = 8
-    },
-
-    KEEP_PETS_WEIGHT = 7,
-    KEEP_PETS_AGE = 60,
-
-    -- test
-    EQUIP_PET_SHARD = { ["Glimmering Sprite"] = "Glimmering" },
-    MAX_REBIRTH_SHECKLES = 1_000_000_000_000_000, -- cái này sẽ override giá trị 0 ở trên
-    BUY_ASCEND_SHOP = {"Egg Capacity Upgrade"},
-
-    EQUIP_PETS = {
-        {"Rhino", 8, 1},
-		{"Rooster", 8, 2},
-    },
-
-    LEVELUP_LOLLIPOP_MIN_LEVEL = 90,
-	
-    USE_PETS_FOR_UPGRADE_SLOT = { 
-        "Rooster", "Bunny", "Dog", "Deer", "Golden Lab", "Chicken",
-        "Flamingo", "Cat", "Black Bunny", "Flamingo", "Seal",
-        "Dairy Cow", "Grey Mouse", "Grizzly Bear", "Jackalope",
-        "Monkey", "Orangutan", "Orange Tabby", "Pig", "Robin",
-        "Sea Turtle", "Sea Otter", "Silver Monkey", "Spotted Deer",
-        "Squirrel", "Brown Mouse", "Seedling", "Badger", "Snail"
-    },
-
-    EXTRA_PET_INVENTORY_SLOTS = 5,
-
-    REMOVE_PET_MAX_UPGRADE = { "Glimmering Sprite", "Starfish", "Robin", "Barn Owl" },  -- Unequip from garden
-
-    BUY_GEAR_SHOP = { 
-        "Grandmaster Sprinkler", "Master Sprinkler", "Godly Sprinkler",
-        "Advanced Sprinkler", "Basic Sprinkler", "Trading Ticket",
-        "Watering Can", "Levelup Lollipop"
-    },
-
-    USE_SPRINKLER = { 
-        "Basic Sprinkler", "Master Sprinkler", "Godly Sprinkler",
-        "Advanced Sprinkler", "Grandmaster Sprinkler"
-    },
-
-    PET_WEBHOOK_URL = "https://discord.com/api/webhooks/1409410321399021608/kdn0L5vVLAK5Tud-rVd-dYDq0AwrXLF33dbkGbjB0TunwY4Z_40ND7C1rawtYRxFQWBx",
-    SHOW_PUBLIC_DISCORD_ID = false,
-    SEED_WEBHOOK_URL = "", 
-
-    NOTIFY_PETS = {
-        "Ruby Squid",
-        "Diamond Panther",
-    },
-
-    NOTIFY_PETS_WEIGHT = { 
-        ["Red Giant Ant"] = 10,
-        ["Bear Bee"] = 10,
-        ["Tanchozuru"] = 10
-    },
-
-    DISCORD_ID = "111zzz",
-    WEBHOOK_NOTE = "PCCC",
-    SHOW_WEBHOOK_USERNAME = true,
-    SHOW_WEBHOOK_JOBID = false,
+script_key = "zqjtyCpKQLsHVJtptGesAzXxAqJBBvXG";
+getgenv().GGFX_MODE = 1 -- or put 1 later = REMOVE_TEXTURES : might be more stable, but no visuals
+getgenv().GDO_HALLOWEEN_WORLD = true
+--read the buyer-announcements to understand these:
+getgenv().GHALLOWEEN_WORLD_BUY_FROM_SPECIFIC_HOUSE = { 1, 2, 3, 5}-- to buy from multiple houses at same time
+getgenv().GHALLOWEEN_WORLD_ALLOW_WORSE_EGG_PLACEMENT = true
+getgenv().GHALLOWEEN_WORLD_USE_BOOSTS = true
+getgenv().GRANK_FIRST = false --if you use this you have to specify values for GREBIRTH_TO and GRANK_TO
+getgenv().GZONE_TO = 1 -- to enter event from W1 put 1, from W2 put 100, from W3 200, from W4 240
+getgenv().GHALLOWEEN_WORLD_RECIPES_TO_DO = {3,4}
+getgenv().GHALLOWEEN_WORLD_HATCH_SPOTS = 1
+getgenv().GALLOW_HOPPING = true
+getgenv().GHOP_ON_STAFF = true
+getgenv().GHALLOWEEN_JOIN_LOCAL = true
+getgenv().GKEEP_CURRENCY_FOR_CRAFTS = "5m"
+getgenv().GEVENT_UPGRADES = {
+  "HalloweenCandyMultiplier",
+  "HalloweenEggLuck",
+  "HalloweenTrickOrTreatLuck",
+  "HalloweenMoreDiamonds",
+  "HalloweenMoreWitchHats",
+  "HalloweenHugeLuck",
+  "HalloweenTitanicLuck"
+} --you can put the comment symbols (these 2 dashes): -- in front of the ones you don't want to upgrade
+getgenv().GWEBHOOK_USERID = "846408418389655572"
+getgenv().GWEBHOOK_LINK = "https://discord.com/api/webhooks/1434182295807328297/fVu2uiA0jzO-7hiJGYobXjSxaGLUknf-y4ePszlnG6bYriPzGA0JrHvYZD_RApAlsLiM"
+getgenv().GHUGE_COUNT = 0 -- amount of huges to keep/not mail
+getgenv().GMAIL_RECEIVERS = {"dinh1974"} -- for Huges and mailrules.
+getgenv().GMAIL_ITEMS = {
+["All Huges"] = {Class = "Pet", Id = "All Huges", MinAmount = 1},
+["Hype Egg 2"] = {Class = "Lootbox", Id = "Hype Egg 2", MinAmount = 1},
+["Brainrot Egg"] = {Class = "Egg", Id = "Exclusive Egg 56", MinAmount = 1},
 }
-
-loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/c916e5b90dc37c71ecf1ec00dfce3d5d.lua"))()
+getgenv().GMAX_MAIL_COST = "5m" -- this can limit how many mails sent/day
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/6e75890d2e36b4613270666c4f5ccab3.lua"))()
