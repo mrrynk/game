@@ -1,17 +1,27 @@
 script_key = "zqjtyCpKQLsHVJtptGesAzXxAqJBBvXG";
-getgenv().GPROGRESS_MODE = "Hybrid"
-getgenv().GGFX_MODE = 1  --1 = REMOVE_TEXTURES : more stable! but no visuals
-getgenv().GRANK_TO = 1
-getgenv().GZONE_TO = 1 -- PLEASE READ FAQ about this property!!! it's important to understand. 99 means last zone W1 only!! 999: go to final zone of game
-getgenv().GMAX_EGG_SLOTS = 1
-getgenv().GMAX_EQUIP_SLOTS = 1
-getgenv().GAUTO_UPGRADE_PETS = false
-getgenv().GHOLD_GIFTS = false
-getgenv().GHOLD_BUNDLES = false
-getgenv().GMAX_ZONE_UPGRADE_COST = 200000
-getgenv().GPOTIONS = {"Coins","Lucky","Treasure Hunter","Walkspeed","Diamonds","Damage"}
-getgenv().GPOTIONS_MAX_TIER = 99
-getgenv().GENCHANTS = {"Tap Power", "Coins", "Treasure Hunter", "Strong Pets", "Criticals", "Diamonds"}
+getgenv().GGFX_MODE = 1 -- or put 1 later = REMOVE_TEXTURES : might be more stable, but no visuals
+getgenv().GDO_HALLOWEEN_WORLD = true
+--read the buyer-announcements to understand these:
+getgenv().GHALLOWEEN_WORLD_BUY_FROM_SPECIFIC_HOUSE = { 1, 2, 3, 5}-- to buy from multiple houses at same time
+getgenv().GHALLOWEEN_WORLD_ALLOW_WORSE_EGG_PLACEMENT = true
+getgenv().GHALLOWEEN_WORLD_USE_BOOSTS = true
+getgenv().GRANK_FIRST = false --if you use this you have to specify values for GREBIRTH_TO and GRANK_TO
+getgenv().GZONE_TO = 1 -- to enter event from W1 put 1, from W2 put 100, from W3 200, from W4 240
+getgenv().GHALLOWEEN_WORLD_RECIPES_TO_DO = {3,4}
+getgenv().GHALLOWEEN_WORLD_HATCH_SPOTS = 1
+getgenv().GALLOW_HOPPING = true
+getgenv().GHOP_ON_STAFF = true
+getgenv().GHALLOWEEN_JOIN_LOCAL = true
+getgenv().GKEEP_CURRENCY_FOR_CRAFTS = "5m"
+getgenv().GEVENT_UPGRADES = {
+  "HalloweenCandyMultiplier",
+  "HalloweenEggLuck",
+  "HalloweenTrickOrTreatLuck",
+  "HalloweenMoreDiamonds",
+  "HalloweenMoreWitchHats",
+  "HalloweenHugeLuck",
+  "HalloweenTitanicLuck"
+} --you can put the comment symbols (these 2 dashes): -- in front of the ones you don't want to upgrade
 getgenv().GWEBHOOK_USERID = "846408418389655572"
 getgenv().GWEBHOOK_LINK = "https://discord.com/api/webhooks/1434182295807328297/fVu2uiA0jzO-7hiJGYobXjSxaGLUknf-y4ePszlnG6bYriPzGA0JrHvYZD_RApAlsLiM"
 getgenv().GHUGE_COUNT = 0 -- amount of huges to keep/not mail
