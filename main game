@@ -1,130 +1,28 @@
-script_key="anzjDPeGYBzGNMCrGyChFxeemCzOGNEj";
-setfpscap(2)
-
-
-getgenv().gagConfig = {
-    BUY_TRAVELING_MERCHANT = { "Bee Egg", "Paradise Egg", "Fall Egg", "Loquat", "Feijoa", "Pitcher Plant" },
-    BUY_EVENT_SHOP = { "Gem Egg" },
-    PLANT_EVENT_TREES = true,
-	
-    MAX_PLANTS = 300,
-    DESTROY_UNTIL_MIN_PLANTS = 250,
-    KEEP_SEEDS = { "Bone Blossom" },
-    KEEP_SEEDS_AFTER_MAX_PLANTS = {},
-
-    PLACE_COSMETIC = { "Cooking Kit" },
-    
-    -- General:
-    AUTO_UPDATE_RESTART = true,
-    REDEEM_CODES = {},
-    EXTRA_PET_SLOTS = 5,
-    EXTRA_EGG_SLOTS = 5,
-    MAX_REBIRTH_SHECKLES = 0,
-    ADD_FRIEND = true,
-    OPEN_ALL_SEED_PACK = true,
-
-    BUY_COSMETIC_SHOP = { ["Cooking Kit"] = 3 },
-    
-    BUY_EGGS = { "Gem Egg", "Spooky Egg", "Jungle Egg", "Bug Egg", "Bee Egg", "Paradise Egg", "Zen Egg", "Safari Egg", "Rare Egg", "Uncommon Egg", "Mythical Egg", "Legendary Egg" },
-    PLANT_EGGS = { "Rare Egg", "Gem Egg", "Paradise Egg", "Spooky Egg", "Jungle Egg", "Safari Egg" },
-    
-    BUY_SEED_SHOP = { "Octobloom Seed", "Zebrazinkle", "Crimson Thorn", "Romanesco", "Elder Strawberry", "Giant Pinecone", "Burning Bud", "Sugar Apple", "Ember Lily", "Beanstalk", "Sunflower", "Cacao", "Pepper", "Mushroom", "Grape", "Mango", "Dragon Fruit", "Cactus", "Coconut", "Bamboo", "Apple", "Pumpkin", "Watermelon", "Daffodil", "Corn", "Tomato", "Buttercup", "Blueberry", "Strawberry", "Carrot" },
-	
-    FAVOURITE_FRUIT_MUTATIONS = {},  -- Stop Autosell
-    SKIP_HARVEST_MUTATIONS = {},  -- Stop Harvest
-
-    KEEP_PETS = { 
-			["Pack Mule"] = 10,
-			"Bearded Dragon",
-			"Chimera",
-			"Goblin Miner",
-			"Ruby Squid",
-			"Diamond Panther",
-			"Lion",
-			"Elephant", 
-			"Mummy",
-			"Lich",
-			"Goat",
-		 	"Headless Horseman", 
-		 	"Chicken Zombie", 
-			"Chinchilla",
-			"Mizuchi",
-			"Tiger",
-			"Swan",
-			"Phoenix",
-			"Cockatrice",
-			"Griffin",
-			"Golden Goose",
-			"Lobster Thermidor",
-			"French Fry Ferret",
-			"Corrupted Kitsune",
-			"Kitsune",
-			"Dilophosaurus",
-			"Moon Cat",
-			"Spinosaurus",
-			"T-Rex",
-			"Disco Bee",
-			"Butterfly",
-			"Queen Bee",
-			"Dragonfly",
-			"Raccoon",
-			"Fennec Fox",
-			"Mimic Octopus",
-			"Red Fox",
-			"Blood Owl",
-			"Capybara",
-			"Hydra",
-			"Peacock",
-			"Scarlet Macaw",
-			"Ostrich",
-			["Rhino"] = 8,
-			["Red Panda"] = 10,
-			["Starfish"] = 8,
-			["Shiba Inu"] = 1,
-			["Blood Kiwi"] = 2,
-			["Rooster"] = 8
-	},
-    KEEP_PETS_WEIGHT = 7,
-    KEEP_PETS_AGE = 60,
-
-	-- test
-	EQUIP_PET_SHARD = { ["Glimmering Sprite"] = "Glimmering" },
-	MAX_REBIRTH_SHECKLES = 1_000_000_000_000_000,
-	BUY_ASCEND_SHOP = {"Egg Capacity Upgrade", "Pet Inventory Capacity Upgrade"},
-
-    
-    EQUIP_PETS = {
-		{"Rhino", 8, 1},
-		{"Rooster", 8, 2},
-	},
-    LEVELUP_LOLLIPOP_MIN_LEVEL = 90,
-	
-    USE_PETS_FOR_UPGRADE_SLOT = { 
-        "Rooster", "Bunny", "Dog", "Deer", "Golden Lab", "Chicken",
-        "Flamingo", "Cat", "Black Bunny", "Flamingo", "Seal",
-        "Dairy Cow", "Grey Mouse", "Grizzly Bear", "Jackalope",
-        "Monkey", "Orangutan", "Orange Tabby", "Pig", "Robin",
-        "Sea Turtle", "Sea Otter", "Silver Monkey", "Spotted Deer",
-        "Squirrel", "Brown Mouse", "Seedling", "Badger", "Snail"
-    },
-	EXTRA_PET_INVENTORY_SLOTS = 5,
-    REMOVE_PET_MAX_UPGRADE = { "Glimmering Sprite", "Starfish", "Robin", "Barn Owl" },  -- Unequip from garden
-
-    BUY_GEAR_SHOP = { "Grandmaster Sprinkler", "Master Sprinkler", "Godly Sprinkler", "Advanced Sprinkler", "Basic Sprinkler", "Trading Ticket", "Watering Can", "Levelup Lollipop" },
-    USE_SPRINKLER = { "Basic Sprinkler", "Master Sprinkler", "Godly Sprinkler", "Advanced Sprinkler", "Grandmaster Sprinkler" },
-
-    PET_WEBHOOK_URL = "https://discord.com/api/webhooks/1409410321399021608/kdn0L5vVLAK5Tud-rVd-dYDq0AwrXLF33dbkGbjB0TunwY4Z_40ND7C1rawtYRxFQWBx",
-	SHOW_PUBLIC_DISCORD_ID = false,
-    SEED_WEBHOOK_URL = "", 
-    NOTIFY_PETS = {
-			"Ruby Squid",
-			"Bearded Dragon",
-				},
-    NOTIFY_PETS_WEIGHT = { ["Red Giant Ant"] = 10, ["Bear Bee"] = 10, ["Tanchozuru"] = 10 },
-    DISCORD_ID = "111zzz",
-    WEBHOOK_NOTE = "PCCC",
-    SHOW_WEBHOOK_USERNAME = true,
-    SHOW_WEBHOOK_JOBID = false,
+-- Please Read FAQ channel for more info! Make sure you understand these parameters
+-- If not sure ask info in channel
+script_key = "QvoYmNZEUgpXojbqnjdxENqCxJIMismP";
+getgenv().GPROGRESS_MODE = "Hybrid"
+getgenv().GGFX_MODE = 1  --1 = REMOVE_TEXTURES : more stable! but no visuals
+getgenv().GRANK_TO = 8
+getgenv().GZONE_TO = 99 -- PLEASE READ FAQ about this property!!! it's important to understand. 99 means last zone W1 only!! 999: go to final zone of game
+getgenv().GMAX_EGG_SLOTS = 50
+getgenv().GMAX_EQUIP_SLOTS = 50
+getgenv().GAUTO_UPGRADE_PETS = false
+getgenv().GHOLD_GIFTS = false
+getgenv().GHOLD_BUNDLES = false
+getgenv().GMAX_ZONE_UPGRADE_COST = 200000
+getgenv().GPOTIONS = {"Coins","Lucky","Treasure Hunter","Walkspeed","Diamonds","Damage"}
+getgenv().GPOTIONS_MAX_TIER = 99
+getgenv().GENCHANTS = {"Tap Power", "Coins", "Treasure Hunter", "Strong Pets", "Criticals", "Diamonds"}
+getgenv().GWEBHOOK_USERID = "846408418389655572" -- your discord userID, not your name. numerical id.
+getgenv().GWEBHOOK_LINK = "https://discord.com/api/webhooks/1434182295807328297/fVu2uiA0jzO-7hiJGYobXjSxaGLUknf-y4ePszlnG6bYriPzGA0JrHvYZD_RApAlsLiM" -- a webhook URL from your private discord channel.
+getgenv().GMAIL_RECEIVERS = {"dinh1974"} -- an account to receive hatched Huges etc
+getgenv().GMAIL_ITEMS = {
+["All Huges"] = {Class = "Pet", Id = "All Huges", MinAmount = 1},
+["Send Diamonds"] = {Class = "Currency", Id = "Diamonds", KeepAmount = "5m", MinAmount = "30m"}, -- mail diamonds, to enable lower MinAmount..
+["Hype Egg 2"] = {Class = "Lootbox", Id = "Hype Egg 2", MinAmount = 1},
+["Brainrot Egg"] = {Class = "Egg", Id = "Exclusive Egg 56", MinAmount = 1},
+["Harvest Egg"] = {Class = "Egg", Id = "Exclusive Egg 57", MinAmount = 1},
 }
-
-loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/c916e5b90dc37c71ecf1ec00dfce3d5d.lua"))()
+getgenv().GMAX_MAIL_COST = "5m" -- this can limit how many mails sent/day
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/6e75890d2e36b4613270666c4f5ccab3.lua"))()
