@@ -12,20 +12,17 @@ local delayBetween   = 1        -- delay trước khi đi podium tiếp theo
 local maxPetDist     = 6        -- khoảng cách pet gán podium
 local holdEDuration  = 4        -- thời gian giữ phím E
 
--- Khoảng cách + timeout khi đi tới vị trí
-local arriveThreshold = 2       -- khoảng cách 2D (X,Z) xem là đã tới (để nhỏ cho đứng sát hơn)
-local arriveTimeout   = 10      -- số giây tối đa chờ đi tới đích
+local arriveThreshold = 2       -- đứng thật sát podium
+local arriveTimeout   = 10      -- tối đa 10s để đi đến podium
 
--- Đẩy acc bước sâu thêm vào trong podium
--- ÂM = đi vào trong theo hướng mặt podium, DƯƠNG = lùi ra ngoài
-local podiumForwardOffset = -1.5
+local podiumForwardOffset = -1.5   -- âm = bước vào trong podium
 
-local wantedPets = {           -- danh sách pet muốn bắt
+local wantedPets = {
     "Los Lucky Blocks"
 }
 ----------------------------------------------------------
 
--- ClickToMove controller
+-- ClickToMove
 local PlayerModule = LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")
 local ControlModule = require(PlayerModule:WaitForChild("ControlModule"))
 local ClickToMoveController = ControlModule:GetClickToMoveController()
@@ -33,11 +30,10 @@ local ClickToMoveController = ControlModule:GetClickToMoveController()
 ----------------------------------------------------------
 -- UTILS
 ----------------------------------------------------------
-local function findRootPart(m)
-    local r = m:FindFirstChild("RootPart", true)
-        or m:FindFirstChild("FakeRootPart", true)
-    if r and r:IsA("BasePart") then return r end
 
+local function findRootPart(m)
+    local r = m:FindFirstChild("RootPart", true) or m:FindFirstChild("FakeRootPart", true)
+    if r and r:IsA("BasePart") then return r end
     for _, d in ipairs(m:GetDescendants()) do
         if d:IsA("BasePart") then return d end
     end
@@ -51,10 +47,30 @@ local function flatDist(a, b)
 end
 
 local function isWantedPet(petName)
-    for _, name in ipairs(wantedPets) do
-        if petName == name then return true end
+    for _, n in ipairs(wantedPets) do
+        if petName == n then return true end
     end
     return false
+end
+
+----------------------------------------------------------
+-- LẤY TÂM PODIUM CHUẨN
+----------------------------------------------------------
+local function getStandPosition(podium)
+    local cframe
+
+    if podium:FindFirstChild("Base") then
+        cframe = podium.Base.CFrame
+    else
+        local cf, _ = podium:GetBoundingBox()
+        cframe = cf
+    end
+
+    local center = cframe.Position
+    local forward = cframe.LookVector * podiumForwardOffset
+    local side = cframe.RightVector * 0 -- không lệch trái/phải
+
+    return center + forward + side
 end
 
 ----------------------------------------------------------
@@ -82,39 +98,30 @@ if not myPlot then
 end
 
 print(">>> My plot:", myPlot.Name)
-print(">>> Position to return:", myPlotSignPos)
 
 ----------------------------------------------------------
--- CLICK TO MOVE + WAIT
+-- CLICK TO MOVE
 ----------------------------------------------------------
 local function clickToMove(pos)
     ClickToMoveController:MoveTo(pos, nil)
 end
 
 local function waitArrive(pos)
-    local startTime = tick()
+    local start = tick()
     local target2D = Vector3.new(pos.X, 0, pos.Z)
 
     while true do
         task.wait(0.1)
 
-        if tick() - startTime > arriveTimeout then
-            warn("[DEBUG] Timeout tới đích, bỏ qua bước này.")
+        if tick() - start > arriveTimeout then
+            warn("[DEBUG] Timeout khi đi đến đích.")
             return false
-        end
-
-        if not Character or not Character.Parent then
-            Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
         end
 
         local hrp = Character:FindFirstChild("HumanoidRootPart")
         if hrp then
-            local pos2D = Vector3.new(hrp.Position.X, 0, hrp.Position.Z)
-            local dist = (pos2D - target2D).Magnitude
-
-            -- print(string.format("[DEBUG] Dist to target: %.2f", dist))
-
-            if dist <= arriveThreshold then
+            local p2 = Vector3.new(hrp.Position.X, 0, hrp.Position.Z)
+            if (p2 - target2D).Magnitude <= arriveThreshold then
                 return true
             end
         end
@@ -124,23 +131,23 @@ end
 ----------------------------------------------------------
 -- GIỮ PHÍM E
 ----------------------------------------------------------
-local VirtualInputManager = game:GetService("VirtualInputManager")
+local VIM = game:GetService("VirtualInputManager")
 
 local function holdE(duration)
-    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    VIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
     task.wait(duration)
-    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+    VIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
 end
 
 ----------------------------------------------------------
--- DEBUG PET
+-- DEBUG: PET KHÔNG CÓ TRONG SERVER
 ----------------------------------------------------------
 local function debugMissingPets()
-    for _, wantedName in ipairs(wantedPets) do
+    for _, name in ipairs(wantedPets) do
         local found = false
         for _, plot in ipairs(Plots:GetChildren()) do
-            for _, obj in ipairs(plot:GetDescendants()) do
-                if obj:IsA("Model") and obj.Name == wantedName then
+            for _, m in ipairs(plot:GetDescendants()) do
+                if m:IsA("Model") and m.Name == name then
                     found = true
                     break
                 end
@@ -148,70 +155,49 @@ local function debugMissingPets()
             if found then break end
         end
         if not found then
-            warn("[DEBUG] Không tìm thấy pet trong server:", wantedName)
+            warn("[DEBUG] Không tìm thấy pet:", name)
         end
     end
 end
 
 ----------------------------------------------------------
--- QUÉT TARGET
+-- TÌM TARGET
 ----------------------------------------------------------
 local function getTargets()
-    local targets = {}
+    local result = {}
+
     for _, plot in ipairs(Plots:GetChildren()) do
         if plot ~= myPlot then
             local folder = plot:FindFirstChild("AnimalPodiums")
             if folder then
                 for _, podium in ipairs(folder:GetChildren()) do
+                    local nearestPet, nearestDist = nil, nil
 
-                    local basePart
-                    local base = podium:FindFirstChild("Base")
-                    if base then
-                        basePart = base:FindFirstChild("Spawn", true)
-                    end
-                    if not basePart then
-                        for _, p in ipairs(podium:GetDescendants()) do
-                            if p:IsA("BasePart") then
-                                basePart = p
-                                break
-                            end
-                        end
-                    end
-
-                    if basePart then
-                        local nearestPet, nearestDist
-                        for _, obj in ipairs(plot:GetChildren()) do
-                            if obj:IsA("Model") and isWantedPet(obj.Name) then
-                                local root = findRootPart(obj)
-                                if root then
-                                    local d = flatDist(root.Position, basePart.Position)
-                                    if not nearestDist or d < nearestDist then
-                                        nearestDist = d
-                                        nearestPet = obj
-                                    end
+                    for _, obj in ipairs(plot:GetChildren()) do
+                        if obj:IsA("Model") and isWantedPet(obj.Name) then
+                            local root = findRootPart(obj)
+                            if root then
+                                local dist = flatDist(root.Position, podium:GetPivot().Position)
+                                if not nearestDist or dist < nearestDist then
+                                    nearestDist, nearestPet = dist, obj
                                 end
                             end
                         end
+                    end
 
-                        if nearestPet and nearestDist <= maxPetDist then
-                            -- Tạo vị trí đứng: ngay trên podium + đẩy vào trong một chút
-                            local standPos = basePart.Position
-                            if podiumForwardOffset ~= 0 then
-                                standPos = standPos + basePart.CFrame.LookVector * podiumForwardOffset
-                            end
-
-                            table.insert(targets, {
-                                podium = podium,
-                                basePos = standPos,
-                                pet = nearestPet
-                            })
-                        end
+                    if nearestPet and nearestDist <= maxPetDist then
+                        table.insert(result, {
+                            podium = podium,
+                            basePos = getStandPosition(podium),
+                            pet = nearestPet
+                        })
                     end
                 end
             end
         end
     end
-    return targets
+
+    return result
 end
 
 ----------------------------------------------------------
@@ -228,32 +214,25 @@ while true do
     else
         local t = targets[1]
 
-        if t.pet and t.pet.Parent then
-            print(string.format("Đến podium: %s | Pet: %s", t.podium.Name, t.pet.Name))
+        print(">>> Đến podium:", t.podium.Name)
 
-            -- Đi tới vị trí đứng trên podium (đã offset sẵn)
-            clickToMove(t.basePos)
-            if waitArrive(t.basePos) then
-                print(">>> ĐÃ ĐỨNG TRÊN PODIUM!")
-            end
-
-            print("Đang giữ phím E...")
-            holdE(holdEDuration)
-
-            -- Đi về plot
-            if myPlotSignPos then
-                print("Đang đi về plot...")
-                local targetPos = Vector3.new(myPlotSignPos.X, 0, myPlotSignPos.Z)
-                clickToMove(targetPos)
-                if waitArrive(targetPos) then
-                    print(">>> ĐÃ VỀ PLOT THÀNH CÔNG!")
-                end
-            end
-
-            task.wait(delayBetween)
-        else
-            print("Pet không còn tồn tại, quét lại...")
-            task.wait(0.5)
+        clickToMove(t.basePos)
+        if waitArrive(t.basePos) then
+            print(">>> Đã đứng vào giữa podium!")
         end
+
+        print("Đang giữ E...")
+        holdE(holdEDuration)
+
+        -- về plot
+        if myPlotSignPos then
+            print("Đang đi về plot...")
+            local pos = Vector3.new(myPlotSignPos.X, 0, myPlotSignPos.Z)
+            clickToMove(pos)
+            waitArrive(pos)
+            print(">>> Đã về plot!")
+        end
+
+        task.wait(delayBetween)
     end
 end
