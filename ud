@@ -12,9 +12,7 @@ local delayBetween = 1      -- delay trước khi đi podium tiếp theo
 local maxPetDist = 6        -- khoảng cách pet gán podium
 local holdEDuration = 4     -- thời gian giữ phím E
 local wantedPets = {        -- danh sách pet muốn bắt (tùy chỉnh)
-    "Dog",
-    "Cat",
-    "Dragon"
+    "Los Lucky Blocks"
 }
 ----------------------------------------------------------
 
