@@ -21,9 +21,9 @@ local delayBetween   = 1        -- delay trước khi đi podium tiếp theo
 local maxPetDist     = 6        -- khoảng cách pet gán podium
 local holdEDuration  = 4        -- thời gian giữ phím E
 
--- khoảng cách & timeout khi di chuyển
-local arriveThreshold = 2       -- nhân vật cách <= 2 stud coi như tới
-local arriveTimeout   = 10      -- tối đa 10s cho 1 lần đi tới đích
+-- khoảng cách & timeout khi di chuyển (3D)
+local arriveThreshold = 2       -- khoảng cách 3D <= 2 stud coi như tới
+local arriveTimeout   = 20      -- tối đa 10s cho 1 lần đi tới đích
 
 local wantedPets = {
     "Los Lucky Blocks"
@@ -49,10 +49,9 @@ RunService.RenderStepped:Connect(function()
         local hrp = Character:FindFirstChild("HumanoidRootPart")
         if hrp then
             local targetPos = hrp.Position
-            -- camera ở trên đầu, nhìn thẳng xuống nhân vật
             camera.CFrame = CFrame.new(
-                targetPos + Vector3.new(0, camHeight, 0), -- vị trí camera
-                targetPos                                -- điểm nhìn
+                targetPos + Vector3.new(0, camHeight, 0),
+                targetPos
             )
         end
     end
@@ -121,21 +120,23 @@ end
 print(">>> My plot:", myPlot.Name)
 
 ----------------------------------------------------------
--- CLICK TO MOVE + CHỜ ĐẾN NƠI
+-- MOVE BẰNG CLICK TO MOVE + CHỜ ĐÚNG TOẠ ĐỘ 3D
 ----------------------------------------------------------
 local function clickToMove(pos)
     ClickToMoveController:MoveTo(pos, nil)
 end
 
-local function waitArrive(pos)
+local function waitArrive3D(pos)
     local start = tick()
-    local target2D = Vector3.new(pos.X, 0, pos.Z)
 
     while true do
         task.wait(0.1)
 
         if tick() - start > arriveTimeout then
-            warn("[DEBUG] Timeout khi đi đến đích.")
+            warn(string.format(
+                "[DEBUG] Timeout khi đi đến đích (%.2f, %.2f, %.2f).",
+                pos.X, pos.Y, pos.Z
+            ))
             return false
         end
 
@@ -145,13 +146,27 @@ local function waitArrive(pos)
 
         local hrp = Character:FindFirstChild("HumanoidRootPart")
         if hrp then
-            local p2 = Vector3.new(hrp.Position.X, 0, hrp.Position.Z)
-            local dist = (p2 - target2D).Magnitude
+            local dist = (hrp.Position - pos).Magnitude
+            -- Debug khoảng cách nếu cần:
+            -- print(string.format("[DEBUG] Dist3D: %.2f", dist))
             if dist <= arriveThreshold then
                 return true
             end
         end
     end
+end
+
+local function moveToExact(pos)
+    print(string.format(
+        "[MOVE] Đi tới toạ độ: X=%.2f, Y=%.2f, Z=%.2f",
+        pos.X, pos.Y, pos.Z
+    ))
+    clickToMove(pos)
+    local ok = waitArrive3D(pos)
+    if ok then
+        print("[MOVE] ĐÃ TỚI ĐÚNG TOẠ ĐỘ.")
+    end
+    return ok
 end
 
 ----------------------------------------------------------
@@ -185,7 +200,7 @@ local function debugMissingPets()
 end
 
 ----------------------------------------------------------
--- QUÉT TARGET
+-- QUÉT TARGET (LẤY CẢ TOẠ ĐỘ PODIUM & PET)
 ----------------------------------------------------------
 local function getTargets()
     local result = {}
@@ -195,7 +210,7 @@ local function getTargets()
             local folder = plot:FindFirstChild("AnimalPodiums")
             if folder then
                 for _, podium in ipairs(folder:GetChildren()) do
-                    local nearestPet, nearestDist = nil, nil
+                    local nearestPet, nearestDist, nearestRoot = nil, nil, nil
 
                     for _, obj in ipairs(plot:GetChildren()) do
                         if obj:IsA("Model") and isWantedPet(obj.Name) then
@@ -203,17 +218,21 @@ local function getTargets()
                             if root then
                                 local dist = flatDist(root.Position, podium:GetPivot().Position)
                                 if not nearestDist or dist < nearestDist then
-                                    nearestDist, nearestPet = dist, obj
+                                    nearestDist, nearestPet, nearestRoot = dist, obj, root
                                 end
                             end
                         end
                     end
 
-                    if nearestPet and nearestDist <= maxPetDist then
+                    if nearestPet and nearestDist <= maxPetDist and nearestRoot then
+                        local podiumPos = getStandPosition(podium)
+                        local petPos = nearestRoot.Position
+
                         table.insert(result, {
                             podium = podium,
-                            basePos = getStandPosition(podium), -- tâm podium
-                            pet = nearestPet
+                            podiumPos = podiumPos,
+                            pet = nearestPet,
+                            petPos = petPos
                         })
                     end
                 end
@@ -238,22 +257,36 @@ while true do
     else
         local t = targets[1]
 
-        print(">>> Đến podium:", t.podium.Name, " | Pet:", t.pet.Name)
+        local podiumPos = t.podiumPos
+        local petPos = t.petPos
 
-        clickToMove(t.basePos)
-        if waitArrive(t.basePos) then
-            print(">>> ĐÃ ĐỨNG Ở TÂM PODIUM!")
-        end
+        print(string.format(
+            ">>> TARGET: Podium=%s | Pet=%s",
+            t.podium.Name, t.pet.Name
+        ))
+        print(string.format(
+            "    PodiumPos: X=%.2f, Y=%.2f, Z=%.2f",
+            podiumPos.X, podiumPos.Y, podiumPos.Z
+        ))
+        print(string.format(
+            "    PetPos   : X=%.2f, Y=%.2f, Z=%.2f",
+            petPos.X, petPos.Y, petPos.Z
+        ))
+
+        -- đi tới đúng toạ độ podiumPos bằng ClickToMove
+        moveToExact(podiumPos)
 
         print("Đang giữ E...")
         holdE(holdEDuration)
 
+        -- về plot theo đúng toạ độ sign
         if myPlotSignPos then
-            print("Đang đi về plot...")
-            local pos = Vector3.new(myPlotSignPos.X, 0, myPlotSignPos.Z)
-            clickToMove(pos)
-            waitArrive(pos)
-            print(">>> ĐÃ VỀ PLOT!")
+            local homePos = Vector3.new(myPlotSignPos.X, myPlotSignPos.Y, myPlotSignPos.Z)
+            print(string.format(
+                "[HOME] Về plot tại: X=%.2f, Y=%.2f, Z=%.2f",
+                homePos.X, homePos.Y, homePos.Z
+            ))
+            moveToExact(homePos)
         end
 
         task.wait(delayBetween)
