@@ -8,10 +8,10 @@ local Plots = workspace:WaitForChild("Plots")
 ----------------------------------------------------------
 -- CONFIG
 ----------------------------------------------------------
-local delayBetween = 1      -- delay trước khi đi podium tiếp theo
-local maxPetDist = 6        -- khoảng cách pet gán podium
-local holdEDuration = 4     -- thời gian giữ phím E
-local wantedPets = {        -- danh sách pet muốn bắt (tùy chỉnh)
+local delayBetween = 1      
+local maxPetDist = 6        
+local holdEDuration = 4     
+local wantedPets = {        
     "Los Lucky Blocks"
 }
 ----------------------------------------------------------
@@ -84,9 +84,9 @@ end
 
 local function waitArrive(pos, threshold)
     threshold = threshold or 4
-    repeat
-        task.wait(0.1)
-    until (Character:FindFirstChild("HumanoidRootPart") and (Character.HumanoidRootPart.Position - pos).Magnitude <= threshold)
+    repeat task.wait(0.1)
+    until (Character:FindFirstChild("HumanoidRootPart")
+        and (Character.HumanoidRootPart.Position - pos).Magnitude <= threshold)
 end
 
 ----------------------------------------------------------
@@ -106,8 +106,6 @@ end
 local function debugMissingPets()
     for _, wantedName in ipairs(wantedPets) do
         local found = false
-
-        -- Dò toàn bộ Plots xem có Model nào trùng tên pet không
         for _, plot in ipairs(Plots:GetChildren()) do
             for _, obj in ipairs(plot:GetDescendants()) do
                 if obj:IsA("Model") and obj.Name == wantedName then
@@ -117,7 +115,6 @@ local function debugMissingPets()
             end
             if found then break end
         end
-
         if not found then
             warn("[DEBUG] Không tìm thấy pet trong server:", wantedName)
         end
@@ -126,7 +123,6 @@ end
 
 ----------------------------------------------------------
 -- HÀM QUÉT TARGETS
--- Trả về danh sách target (podium + pet gần nhất)
 ----------------------------------------------------------
 local function getTargets()
     local targets = {}
@@ -183,39 +179,33 @@ end
 print("\n>>> AUTO BẮT ĐẦU...\n")
 
 while true do
-    -- MỖI VÒNG CHỈ XỬ LÝ 1 PODIUM RỒI QUÉT LẠI
     local targets = getTargets()
 
     if #targets == 0 then
-        -- Không có target hợp lệ, debug xem pet trong wantedPets có tồn tại trong server không
         debugMissingPets()
         task.wait(2)
     else
-        -- Lấy 1 target (ví dụ: target đầu tiên)
         local t = targets[1]
 
-        -- Kiểm tra pet còn tồn tại
         if t.pet and t.pet.Parent then
             print(string.format("Đến podium: %s | Pet: %s", t.podium.Name, t.pet.Name))
 
-            -- Đi đến podium
             clickToMove(t.basePos)
             waitArrive(t.basePos)
 
             print("Đang giữ phím E...")
             holdE(holdEDuration)
 
-            -- Quay về plot dưới bảng tên
             if myPlotSignPos then
+                print("Đang đi về vị trí plot...")
                 local targetPos = Vector3.new(myPlotSignPos.X, 0, myPlotSignPos.Z)
                 clickToMove(targetPos)
                 waitArrive(targetPos)
+                print("Đã về plot thành công!")
             end
 
-            -- Delay trước khi quét lại target mới
             task.wait(delayBetween)
         else
-            -- Pet vừa biến mất trong lúc xử lý -> bỏ qua, quét lại
             print("Pet không còn tồn tại, quét lại...")
             task.wait(0.5)
         end
