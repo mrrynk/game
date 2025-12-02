@@ -1,7 +1,16 @@
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local VIM = game:GetService("VirtualInputManager")
+
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local Humanoid = Character:WaitForChild("Humanoid")
+
+-- update Character khi respawn
+LocalPlayer.CharacterAdded:Connect(function(char)
+    Character = char
+    Humanoid = char:WaitForChild("Humanoid")
+end)
 
 local Plots = workspace:WaitForChild("Plots")
 
@@ -19,6 +28,9 @@ local arriveTimeout   = 10      -- tối đa 10s cho 1 lần đi tới đích
 local wantedPets = {
     "Los Lucky Blocks"
 }
+
+-- CAMERA CONFIG
+local camHeight = 4            -- cao bao nhiêu stud trên đầu nhân vật
 ----------------------------------------------------------
 
 -- ClickToMove
@@ -27,9 +39,28 @@ local ControlModule = require(PlayerModule:WaitForChild("ControlModule"))
 local ClickToMoveController = ControlModule:GetClickToMoveController()
 
 ----------------------------------------------------------
+-- CAMERA TOP DOWN THEO NHÂN VẬT
+----------------------------------------------------------
+local camera = workspace.CurrentCamera
+camera.CameraType = Enum.CameraType.Scriptable
+
+RunService.RenderStepped:Connect(function()
+    if Character and Character.Parent then
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local targetPos = hrp.Position
+            -- camera ở trên đầu, nhìn thẳng xuống nhân vật
+            camera.CFrame = CFrame.new(
+                targetPos + Vector3.new(0, camHeight, 0), -- vị trí camera
+                targetPos                                -- điểm nhìn
+            )
+        end
+    end
+end)
+
+----------------------------------------------------------
 -- UTILS
 ----------------------------------------------------------
-
 local function findRootPart(m)
     local r = m:FindFirstChild("RootPart", true) or m:FindFirstChild("FakeRootPart", true)
     if r and r:IsA("BasePart") then return r end
@@ -56,12 +87,9 @@ end
 -- LẤY TÂM PODIUM (AUTO CĂN TÂM)
 ----------------------------------------------------------
 local function getStandPosition(podium)
-    -- ưu tiên Base nếu có, để tâm đúng ô vuông xám
     if podium:FindFirstChild("Base") and podium.Base:IsA("BasePart") then
         return podium.Base.Position
     end
-
-    -- không có Base thì lấy bounding box của cả podium
     local cf, _ = podium:GetBoundingBox()
     return cf.Position
 end
@@ -111,11 +139,14 @@ local function waitArrive(pos)
             return false
         end
 
+        if not Character or not Character.Parent then
+            Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        end
+
         local hrp = Character:FindFirstChild("HumanoidRootPart")
         if hrp then
             local p2 = Vector3.new(hrp.Position.X, 0, hrp.Position.Z)
             local dist = (p2 - target2D).Magnitude
-            -- print(string.format("[DEBUG] Dist: %.2f", dist))
             if dist <= arriveThreshold then
                 return true
             end
@@ -126,8 +157,6 @@ end
 ----------------------------------------------------------
 -- GIỮ PHÍM E
 ----------------------------------------------------------
-local VIM = game:GetService("VirtualInputManager")
-
 local function holdE(duration)
     VIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
     task.wait(duration)
@@ -209,7 +238,7 @@ while true do
     else
         local t = targets[1]
 
-        print(">>> Đến podium:", t.podium.Name, "| Pet:", t.pet.Name)
+        print(">>> Đến podium:", t.podium.Name, " | Pet:", t.pet.Name)
 
         clickToMove(t.basePos)
         if waitArrive(t.basePos) then
