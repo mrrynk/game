@@ -30,7 +30,7 @@ local wantedPets = {
 }
 
 -- CAMERA CONFIG
-local camHeight = 7            -- cao bao nhiêu stud trên đầu nhân vật
+local camHeight = 10            -- cao bao nhiêu stud trên đầu nhân vật
 ----------------------------------------------------------
 
 -- ClickToMove
