@@ -109,7 +109,7 @@ local function debugMissingPets()
 
         -- Dò toàn bộ Plots xem có Model nào trùng tên pet không
         for _, plot in ipairs(Plots:GetChildren()) do
-            for _, obj in ipairs(plot:GetChildren()) do
+            for _, obj in ipairs(plot:GetDescendants()) do
                 if obj:IsA("Model") and obj.Name == wantedName then
                     found = true
                     break
@@ -126,6 +126,7 @@ end
 
 ----------------------------------------------------------
 -- HÀM QUÉT TARGETS
+-- Trả về danh sách target (podium + pet gần nhất)
 ----------------------------------------------------------
 local function getTargets()
     local targets = {}
@@ -167,7 +168,6 @@ local function getTargets()
                                 basePos = basePart.Position,
                                 pet = nearestPet
                             })
-                            print("Target:", podium.Name, "| Pet:", nearestPet.Name)
                         end
                     end
                 end
@@ -183,31 +183,41 @@ end
 print("\n>>> AUTO BẮT ĐẦU...\n")
 
 while true do
+    -- MỖI VÒNG CHỈ XỬ LÝ 1 PODIUM RỒI QUÉT LẠI
     local targets = getTargets()
-    
+
     if #targets == 0 then
         -- Không có target hợp lệ, debug xem pet trong wantedPets có tồn tại trong server không
         debugMissingPets()
-        task.wait(2) -- không còn pet, đợi rồi quét lại
+        task.wait(2)
     else
-        for i, t in ipairs(targets) do
-            -- Kiểm tra pet còn tồn tại
-            if t.pet and t.pet.Parent then
-                print(string.format("[%d] Đến podium: %s | Pet: %s", i, t.podium.Name, t.pet.Name))
-                clickToMove(t.basePos)
-                waitArrive(t.basePos)
-                print("Đang giữ phím E...")
-                holdE(holdEDuration)
-                
-                -- Quay về plot dưới bảng tên
-                if myPlotSignPos then
-                    local targetPos = Vector3.new(myPlotSignPos.X, 0, myPlotSignPos.Z)
-                    clickToMove(targetPos)
-                    waitArrive(targetPos)
-                end
-                
-                task.wait(delayBetween)
+        -- Lấy 1 target (ví dụ: target đầu tiên)
+        local t = targets[1]
+
+        -- Kiểm tra pet còn tồn tại
+        if t.pet and t.pet.Parent then
+            print(string.format("Đến podium: %s | Pet: %s", t.podium.Name, t.pet.Name))
+
+            -- Đi đến podium
+            clickToMove(t.basePos)
+            waitArrive(t.basePos)
+
+            print("Đang giữ phím E...")
+            holdE(holdEDuration)
+
+            -- Quay về plot dưới bảng tên
+            if myPlotSignPos then
+                local targetPos = Vector3.new(myPlotSignPos.X, 0, myPlotSignPos.Z)
+                clickToMove(targetPos)
+                waitArrive(targetPos)
             end
+
+            -- Delay trước khi quét lại target mới
+            task.wait(delayBetween)
+        else
+            -- Pet vừa biến mất trong lúc xử lý -> bỏ qua, quét lại
+            print("Pet không còn tồn tại, quét lại...")
+            task.wait(0.5)
         end
     end
 end
