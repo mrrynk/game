@@ -1,0 +1,180 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+
+local Plots = workspace:WaitForChild("Plots")
+
+----------------------------------------------------------
+-- CONFIG
+----------------------------------------------------------
+local delayBetween = 1      -- delay trước khi đi podium tiếp theo
+local maxPetDist = 6        -- khoảng cách pet gán podium
+local holdEDuration = 4     -- thời gian giữ phím E
+----------------------------------------------------------
+
+-- ClickToMove controller
+local PlayerModule = LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")
+local ControlModule = require(PlayerModule:WaitForChild("ControlModule"))
+local ClickToMoveController = ControlModule:GetClickToMoveController()
+
+----------------------------------------------------------
+-- UTILS
+----------------------------------------------------------
+local function findRootPart(m)
+    local r = m:FindFirstChild("RootPart", true)
+        or m:FindFirstChild("FakeRootPart", true)
+    if r and r:IsA("BasePart") then return r end
+
+    for _, d in ipairs(m:GetDescendants()) do
+        if d:IsA("BasePart") then return d end
+    end
+    return nil
+end
+
+local function flatDist(a, b)
+    local dx = a.X - b.X
+    local dz = a.Z - b.Z
+    return math.sqrt(dx*dx + dz*dz)
+end
+
+----------------------------------------------------------
+-- TÌM PLOT CỦA BẠN
+----------------------------------------------------------
+local expectedName = LocalPlayer.Name .. "'s Base"
+local myPlot = nil
+local myPlotSignPos = nil
+
+for _, plot in ipairs(Plots:GetChildren()) do
+    local sign = plot:FindFirstChild("PlotSign")
+    if sign and sign:FindFirstChild("SurfaceGui") then
+        local label = sign.SurfaceGui.Frame:FindFirstChild("TextLabel")
+        if label and label.Text == expectedName then
+            myPlot = plot
+            myPlotSignPos = sign.Position
+            break
+        end
+    end
+end
+
+if not myPlot then
+    warn("Không tìm thấy plot của bạn:", expectedName)
+    return
+end
+
+print(">>> My plot:", myPlot.Name)
+print(">>> Position to return:", myPlotSignPos)
+
+----------------------------------------------------------
+-- TÌM PODIUM + PET CỦA NGƯỜI KHÁC
+----------------------------------------------------------
+local targets = {}
+
+for _, plot in ipairs(Plots:GetChildren()) do
+    if plot == myPlot then continue end
+
+    local folder = plot:FindFirstChild("AnimalPodiums")
+    if not folder then continue end
+
+    for _, podium in ipairs(folder:GetChildren()) do
+        local basePart
+
+        local base = podium:FindFirstChild("Base")
+        if base then
+            basePart = base:FindFirstChild("Spawn", true)
+        end
+        if not basePart then
+            for _, p in ipairs(podium:GetDescendants()) do
+                if p:IsA("BasePart") then basePart = p break end
+            end
+        end
+        if not basePart then continue end
+
+        local nearestPet, nearestDist
+        for _, obj in ipairs(plot:GetChildren()) do
+            if obj:IsA("Model") and obj.Name ~= "AnimalPodiums" then
+                local root = findRootPart(obj)
+                if root then
+                    local d = flatDist(root.Position, basePart.Position)
+                    if not nearestDist or d < nearestDist then
+                        nearestDist = d
+                        nearestPet = obj
+                    end
+                end
+            end
+        end
+
+        if nearestPet and nearestDist <= maxPetDist then
+            table.insert(targets, {
+                podium = podium,
+                basePos = basePart.Position,
+                pet = nearestPet
+            })
+
+            print("Target:", podium.Name, "| Pet:", nearestPet.Name)
+        end
+    end
+end
+
+print(">>> Tổng target:", #targets)
+
+----------------------------------------------------------
+-- CLICK TO MOVE
+----------------------------------------------------------
+local function clickToMove(pos)
+    ClickToMoveController:MoveTo(pos, nil)
+end
+
+local function waitArrive(pos, threshold)
+    threshold = threshold or 4
+    repeat
+        task.wait(0.1)
+    until (LocalPlayer.Character.PrimaryPart.Position - pos).Magnitude <= threshold
+end
+
+----------------------------------------------------------
+-- GIỮ PHÍM E = VirtualInputManager
+----------------------------------------------------------
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local function holdE(duration)
+    -- Nhấn E
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    task.wait(duration)
+    -- Thả E
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+end
+
+----------------------------------------------------------
+-- AUTO RUN
+----------------------------------------------------------
+print("\n>>> AUTO BẮT ĐẦU...\n")
+
+for i, t in ipairs(targets) do
+    print(string.format("[%d] Đến podium: %s | pet: %s",
+        i, t.podium.Name, t.pet.Name
+    ))
+
+    -------------------------
+    -- 1. Đi đến podium
+    -------------------------
+    clickToMove(t.basePos)
+    waitArrive(t.basePos)
+
+    -------------------------
+    -- 2. Nhấn giữ E
+    -------------------------
+    print("Đang giữ phím E...")
+    holdE(holdEDuration)
+
+    -------------------------
+    -- 3. Quay về plot của mình
+    -------------------------
+    print("Quay về plot của mình...")
+    clickToMove(myPlotSignPos)
+    waitArrive(myPlotSignPos)
+
+    task.wait(delayBetween)
+end
+
+print("\n>>> HOÀN THÀNH AUTO!!!")
