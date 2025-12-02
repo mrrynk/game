@@ -12,10 +12,9 @@ local delayBetween   = 1        -- delay trước khi đi podium tiếp theo
 local maxPetDist     = 6        -- khoảng cách pet gán podium
 local holdEDuration  = 4        -- thời gian giữ phím E
 
-local arriveThreshold = 2       -- đứng thật sát podium
-local arriveTimeout   = 10      -- tối đa 10s để đi đến podium
-
-local podiumForwardOffset = -1.5   -- âm = bước vào trong podium
+-- khoảng cách & timeout khi di chuyển
+local arriveThreshold = 2       -- nhân vật cách <= 2 stud coi như tới
+local arriveTimeout   = 10      -- tối đa 10s cho 1 lần đi tới đích
 
 local wantedPets = {
     "Los Lucky Blocks"
@@ -54,27 +53,21 @@ local function isWantedPet(petName)
 end
 
 ----------------------------------------------------------
--- LẤY TÂM PODIUM CHUẨN
+-- LẤY TÂM PODIUM (AUTO CĂN TÂM)
 ----------------------------------------------------------
 local function getStandPosition(podium)
-    local cframe
-
-    if podium:FindFirstChild("Base") then
-        cframe = podium.Base.CFrame
-    else
-        local cf, _ = podium:GetBoundingBox()
-        cframe = cf
+    -- ưu tiên Base nếu có, để tâm đúng ô vuông xám
+    if podium:FindFirstChild("Base") and podium.Base:IsA("BasePart") then
+        return podium.Base.Position
     end
 
-    local center = cframe.Position
-    local forward = cframe.LookVector * podiumForwardOffset
-    local side = cframe.RightVector * 0 -- không lệch trái/phải
-
-    return center + forward + side
+    -- không có Base thì lấy bounding box của cả podium
+    local cf, _ = podium:GetBoundingBox()
+    return cf.Position
 end
 
 ----------------------------------------------------------
--- TÌM PLOT
+-- TÌM PLOT CỦA BẠN
 ----------------------------------------------------------
 local expectedName = LocalPlayer.Name .. "'s Base"
 local myPlot = nil
@@ -100,7 +93,7 @@ end
 print(">>> My plot:", myPlot.Name)
 
 ----------------------------------------------------------
--- CLICK TO MOVE
+-- CLICK TO MOVE + CHỜ ĐẾN NƠI
 ----------------------------------------------------------
 local function clickToMove(pos)
     ClickToMoveController:MoveTo(pos, nil)
@@ -121,7 +114,9 @@ local function waitArrive(pos)
         local hrp = Character:FindFirstChild("HumanoidRootPart")
         if hrp then
             local p2 = Vector3.new(hrp.Position.X, 0, hrp.Position.Z)
-            if (p2 - target2D).Magnitude <= arriveThreshold then
+            local dist = (p2 - target2D).Magnitude
+            -- print(string.format("[DEBUG] Dist: %.2f", dist))
+            if dist <= arriveThreshold then
                 return true
             end
         end
@@ -161,7 +156,7 @@ local function debugMissingPets()
 end
 
 ----------------------------------------------------------
--- TÌM TARGET
+-- QUÉT TARGET
 ----------------------------------------------------------
 local function getTargets()
     local result = {}
@@ -188,7 +183,7 @@ local function getTargets()
                     if nearestPet and nearestDist <= maxPetDist then
                         table.insert(result, {
                             podium = podium,
-                            basePos = getStandPosition(podium),
+                            basePos = getStandPosition(podium), -- tâm podium
                             pet = nearestPet
                         })
                     end
@@ -214,23 +209,22 @@ while true do
     else
         local t = targets[1]
 
-        print(">>> Đến podium:", t.podium.Name)
+        print(">>> Đến podium:", t.podium.Name, "| Pet:", t.pet.Name)
 
         clickToMove(t.basePos)
         if waitArrive(t.basePos) then
-            print(">>> Đã đứng vào giữa podium!")
+            print(">>> ĐÃ ĐỨNG Ở TÂM PODIUM!")
         end
 
         print("Đang giữ E...")
         holdE(holdEDuration)
 
-        -- về plot
         if myPlotSignPos then
             print("Đang đi về plot...")
             local pos = Vector3.new(myPlotSignPos.X, 0, myPlotSignPos.Z)
             clickToMove(pos)
             waitArrive(pos)
-            print(">>> Đã về plot!")
+            print(">>> ĐÃ VỀ PLOT!")
         end
 
         task.wait(delayBetween)
