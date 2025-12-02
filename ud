@@ -19,7 +19,7 @@ local Plots = workspace:WaitForChild("Plots")
 ----------------------------------------------------------
 local delayBetween   = 1        -- delay trước khi đi podium tiếp theo
 local maxPetDist     = 6        -- khoảng cách pet gán podium
-local holdEDuration  = 4        -- thời gian giữ phím E
+local holdEDuration  = 7        -- thời gian giữ phím E
 
 -- khoảng cách & timeout khi di chuyển
 local arriveThreshold = 2       -- nhân vật cách <= 2 stud coi như tới
