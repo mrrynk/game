@@ -18,19 +18,19 @@ local Plots = workspace:WaitForChild("Plots")
 -- CONFIG
 ----------------------------------------------------------
 local delayBetween   = 1        -- delay trước khi đi podium tiếp theo
-local maxPetDist     = 6        -- khoảng cách pet gán podium
+local maxPetDist     = 12       -- khoảng cách 3D tối đa pet được gắn vào podium (tăng chút cho nhiều tầng)
 local holdEDuration  = 4        -- thời gian giữ phím E
 
 -- khoảng cách & timeout khi di chuyển (3D)
-local arriveThreshold = 2       -- khoảng cách 3D <= 2 stud coi như tới
-local arriveTimeout   = 20      -- tối đa 10s cho 1 lần đi tới đích
+local arriveThreshold = 2       -- khoảng cách 3D <= 2 stud coi như tới đúng điểm
+local arriveTimeout   = 10      -- tối đa 10s cho 1 lần đi tới đích
 
 local wantedPets = {
     "Los Lucky Blocks"
 }
 
 -- CAMERA CONFIG
-local camHeight = 10            -- cao bao nhiêu stud trên đầu nhân vật
+local camHeight = 40            -- cao bao nhiêu stud trên đầu nhân vật
 ----------------------------------------------------------
 
 -- ClickToMove
@@ -67,12 +67,6 @@ local function findRootPart(m)
         if d:IsA("BasePart") then return d end
     end
     return nil
-end
-
-local function flatDist(a, b)
-    local dx = a.X - b.X
-    local dz = a.Z - b.Z
-    return math.sqrt(dx*dx + dz*dz)
 end
 
 local function isWantedPet(petName)
@@ -147,7 +141,6 @@ local function waitArrive3D(pos)
         local hrp = Character:FindFirstChild("HumanoidRootPart")
         if hrp then
             local dist = (hrp.Position - pos).Magnitude
-            -- Debug khoảng cách nếu cần:
             -- print(string.format("[DEBUG] Dist3D: %.2f", dist))
             if dist <= arriveThreshold then
                 return true
@@ -200,7 +193,8 @@ local function debugMissingPets()
 end
 
 ----------------------------------------------------------
--- QUÉT TARGET (LẤY CẢ TOẠ ĐỘ PODIUM & PET)
+-- QUÉT TARGET
+-- Với mỗi PET -> tìm PODIUM gần nhất (3D), rồi map pet đó vào podium đó
 ----------------------------------------------------------
 local function getTargets()
     local result = {}
@@ -209,36 +203,72 @@ local function getTargets()
         if plot ~= myPlot then
             local folder = plot:FindFirstChild("AnimalPodiums")
             if folder then
+                -- 1) Gom danh sách podium + toạ độ đứng
+                local podiumList = {}
                 for _, podium in ipairs(folder:GetChildren()) do
-                    local nearestPet, nearestDist, nearestRoot = nil, nil, nil
+                    local pos = getStandPosition(podium)
+                    table.insert(podiumList, {
+                        instance = podium,
+                        pos = pos
+                    })
+                end
 
-                    for _, obj in ipairs(plot:GetChildren()) do
-                        if obj:IsA("Model") and isWantedPet(obj.Name) then
-                            local root = findRootPart(obj)
-                            if root then
-                                local dist = flatDist(root.Position, podium:GetPivot().Position)
+                -- 2) Duyệt từng pet muốn bắt trong plot
+                for _, obj in ipairs(plot:GetDescendants()) do
+                    if obj:IsA("Model") and isWantedPet(obj.Name) then
+                        local root = findRootPart(obj)
+                        if root then
+                            local petPos = root.Position
+                            local nearestPod = nil
+                            local nearestDist = nil
+
+                            -- tìm podium gần pet nhất (3D)
+                            for _, pd in ipairs(podiumList) do
+                                local dist = (pd.pos - petPos).Magnitude
                                 if not nearestDist or dist < nearestDist then
-                                    nearestDist, nearestPet, nearestRoot = dist, obj, root
+                                    nearestDist = dist
+                                    nearestPod = pd
+                                end
+                            end
+
+                            if nearestPod and nearestDist <= maxPetDist then
+                                table.insert(result, {
+                                    podium   = nearestPod.instance,
+                                    podiumPos = nearestPod.pos,
+                                    pet      = obj,
+                                    petPos   = petPos,
+                                    dist     = nearestDist
+                                })
+                                print(string.format(
+                                    "[MAP] Pet %s (%.1f, %.1f, %.1f) -> Podium %s (%.1f, %.1f, %.1f) | Dist=%.2f",
+                                    obj.Name, petPos.X, petPos.Y, petPos.Z,
+                                    nearestPod.instance.Name, nearestPod.pos.X, nearestPod.pos.Y, nearestPod.pos.Z,
+                                    nearestDist
+                                ))
+                            else
+                                if nearestDist then
+                                    print(string.format(
+                                        "[SKIP] Pet %s quá xa podium (minDist=%.2f)",
+                                        obj.Name, nearestDist
+                                    ))
+                                else
+                                    print(string.format(
+                                        "[SKIP] Pet %s không tìm được podium nào.",
+                                        obj.Name
+                                    ))
                                 end
                             end
                         end
-                    end
-
-                    if nearestPet and nearestDist <= maxPetDist and nearestRoot then
-                        local podiumPos = getStandPosition(podium)
-                        local petPos = nearestRoot.Position
-
-                        table.insert(result, {
-                            podium = podium,
-                            podiumPos = podiumPos,
-                            pet = nearestPet,
-                            petPos = petPos
-                        })
                     end
                 end
             end
         end
     end
+
+    -- sort cho vui: ưu tiên pet có podium gần nhất trước
+    table.sort(result, function(a, b)
+        return (a.dist or 9999) < (b.dist or 9999)
+    end)
 
     return result
 end
@@ -261,8 +291,8 @@ while true do
         local petPos = t.petPos
 
         print(string.format(
-            ">>> TARGET: Podium=%s | Pet=%s",
-            t.podium.Name, t.pet.Name
+            "\n>>> TARGET: Podium=%s | Pet=%s | Dist=%.2f",
+            t.podium.Name, t.pet.Name, t.dist or -1
         ))
         print(string.format(
             "    PodiumPos: X=%.2f, Y=%.2f, Z=%.2f",
@@ -273,13 +303,13 @@ while true do
             petPos.X, petPos.Y, petPos.Z
         ))
 
-        -- đi tới đúng toạ độ podiumPos bằng ClickToMove
+        -- đi tới đúng toạ độ podium gần pet nhất
         moveToExact(podiumPos)
 
         print("Đang giữ E...")
         holdE(holdEDuration)
 
-        -- về plot theo đúng toạ độ sign
+        -- về plot
         if myPlotSignPos then
             local homePos = Vector3.new(myPlotSignPos.X, myPlotSignPos.Y, myPlotSignPos.Z)
             print(string.format(
