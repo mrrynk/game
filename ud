@@ -12,9 +12,13 @@ local delayBetween   = 1        -- delay trước khi đi podium tiếp theo
 local maxPetDist     = 6        -- khoảng cách pet gán podium
 local holdEDuration  = 4        -- thời gian giữ phím E
 
--- ⚠ CONFIG KHOẢNG CÁCH ĐẾN NƠI VÀ THỜI GIAN CHỜ
-local arriveThreshold = 6       -- khoảng cách xem là đã tới (X,Z)
+-- Khoảng cách + timeout khi đi tới vị trí
+local arriveThreshold = 2       -- khoảng cách 2D (X,Z) xem là đã tới (để nhỏ cho đứng sát hơn)
 local arriveTimeout   = 10      -- số giây tối đa chờ đi tới đích
+
+-- Đẩy acc bước sâu thêm vào trong podium
+-- ÂM = đi vào trong theo hướng mặt podium, DƯƠNG = lùi ra ngoài
+local podiumForwardOffset = -1.5
 
 local wantedPets = {           -- danh sách pet muốn bắt
     "Los Lucky Blocks"
@@ -81,13 +85,12 @@ print(">>> My plot:", myPlot.Name)
 print(">>> Position to return:", myPlotSignPos)
 
 ----------------------------------------------------------
--- CLICK TO MOVE
+-- CLICK TO MOVE + WAIT
 ----------------------------------------------------------
 local function clickToMove(pos)
     ClickToMoveController:MoveTo(pos, nil)
 end
 
--- WAIT ARRIVE CÓ CONFIG
 local function waitArrive(pos)
     local startTime = tick()
     local target2D = Vector3.new(pos.X, 0, pos.Z)
@@ -108,6 +111,8 @@ local function waitArrive(pos)
         if hrp then
             local pos2D = Vector3.new(hrp.Position.X, 0, hrp.Position.Z)
             local dist = (pos2D - target2D).Magnitude
+
+            -- print(string.format("[DEBUG] Dist to target: %.2f", dist))
 
             if dist <= arriveThreshold then
                 return true
@@ -189,9 +194,15 @@ local function getTargets()
                         end
 
                         if nearestPet and nearestDist <= maxPetDist then
+                            -- Tạo vị trí đứng: ngay trên podium + đẩy vào trong một chút
+                            local standPos = basePart.Position
+                            if podiumForwardOffset ~= 0 then
+                                standPos = standPos + basePart.CFrame.LookVector * podiumForwardOffset
+                            end
+
                             table.insert(targets, {
                                 podium = podium,
-                                basePos = basePart.Position,
+                                basePos = standPos,
                                 pet = nearestPet
                             })
                         end
@@ -220,9 +231,10 @@ while true do
         if t.pet and t.pet.Parent then
             print(string.format("Đến podium: %s | Pet: %s", t.podium.Name, t.pet.Name))
 
+            -- Đi tới vị trí đứng trên podium (đã offset sẵn)
             clickToMove(t.basePos)
             if waitArrive(t.basePos) then
-                print(">>> Đã đến podium!")
+                print(">>> ĐÃ ĐỨNG TRÊN PODIUM!")
             end
 
             print("Đang giữ phím E...")
@@ -233,9 +245,8 @@ while true do
                 print("Đang đi về plot...")
                 local targetPos = Vector3.new(myPlotSignPos.X, 0, myPlotSignPos.Z)
                 clickToMove(targetPos)
-
                 if waitArrive(targetPos) then
-                    print(">>> Đã về plot thành công!")
+                    print(">>> ĐÃ VỀ PLOT THÀNH CÔNG!")
                 end
             end
 
