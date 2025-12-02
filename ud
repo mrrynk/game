@@ -23,14 +23,14 @@ local holdEDuration  = 4        -- thời gian giữ phím E
 
 -- khoảng cách & timeout khi di chuyển (3D)
 local arriveThreshold = 2       -- khoảng cách 3D <= 2 stud coi như tới đúng điểm
-local arriveTimeout   = 10      -- tối đa 10s cho 1 lần đi tới đích
+local arriveTimeout   = 20      -- tối đa 10s cho 1 lần đi tới đích
 
 local wantedPets = {
     "Los Lucky Blocks"
 }
 
 -- CAMERA CONFIG
-local camHeight = 40            -- cao bao nhiêu stud trên đầu nhân vật
+local camHeight = 10            -- cao bao nhiêu stud trên đầu nhân vật
 ----------------------------------------------------------
 
 -- ClickToMove
