@@ -101,6 +101,30 @@ local function holdE(duration)
 end
 
 ----------------------------------------------------------
+-- DEBUG: KIỂM TRA PET KHÔNG CÓ TRONG SERVER
+----------------------------------------------------------
+local function debugMissingPets()
+    for _, wantedName in ipairs(wantedPets) do
+        local found = false
+
+        -- Dò toàn bộ Plots xem có Model nào trùng tên pet không
+        for _, plot in ipairs(Plots:GetChildren()) do
+            for _, obj in ipairs(plot:GetChildren()) do
+                if obj:IsA("Model") and obj.Name == wantedName then
+                    found = true
+                    break
+                end
+            end
+            if found then break end
+        end
+
+        if not found then
+            warn("[DEBUG] Không tìm thấy pet trong server:", wantedName)
+        end
+    end
+end
+
+----------------------------------------------------------
 -- HÀM QUÉT TARGETS
 ----------------------------------------------------------
 local function getTargets()
@@ -162,6 +186,8 @@ while true do
     local targets = getTargets()
     
     if #targets == 0 then
+        -- Không có target hợp lệ, debug xem pet trong wantedPets có tồn tại trong server không
+        debugMissingPets()
         task.wait(2) -- không còn pet, đợi rồi quét lại
     else
         for i, t in ipairs(targets) do
