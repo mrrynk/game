@@ -1,1 +1,1 @@
-local s;for i=1,5 do s=pcall(function()loadstring(game:HttpGet("https://cdn.yummydata.click/scripts/pet99"))()end)if s then break end wait(5)end
+local s;for i=1,5 do s=pcall(function()loadstring(game:HttpGet("https://cdn.yummydata.click/scripts/gag"))()end)if s then break end wait(5)end
